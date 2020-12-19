@@ -8,6 +8,7 @@ module.exports = (schema) => {
     if (!valid) {
       return res.status(400).json(validate.errors);
     }
+
     next();
   }
 }

@@ -6,6 +6,14 @@ module.exports = {
     return ids[0];
   },
 
+  findById: async (id) => {
+    const users = await db('users').where('id', id);
+    if (users.length === 0) {
+      return null;
+    }
+    return users[0];
+  },
+
   findByUserName: async (username) => {
     const users = await db('users').where('username', username);
     if (users.length === 0) {
@@ -24,5 +32,13 @@ module.exports = {
       return true;
     }
     return false;
+  },
+
+  updatePassword: (userId, password) => {
+    return db('users').where('id', userId).update('password', password);
+  },
+
+  update: (userId, data) => {
+    return db('users').where('id', userId).update(data);
   }
 }

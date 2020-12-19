@@ -16,9 +16,8 @@ app.use(express.json());
 // APIs
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/api/users', require('./routes/user.route'));
-app.get('/', auth, (req, res) => {
-    return res.json('Hello word');
-});
+app.use('/api/categories', require('./routes/category.route'));
+app.use('/api/courses', require('./routes/courses.route'));
 
 // all url above if not match then into default url under 
 app.use((req, res, next) => {

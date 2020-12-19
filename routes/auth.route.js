@@ -10,6 +10,7 @@ const authSchema = require('../schemas/auth.json');
 const tokenSchema = require('../schemas/token.json');
 const userModel = require('../models/user.model');
 
+//login
 router.post('/', validate(authSchema), async (req, res) => {
   const user = await userModel.findByUserName(req.body.username);
   if (user === null) {
@@ -30,7 +31,7 @@ router.post('/', validate(authSchema), async (req, res) => {
       role: user.role,
     },
     process.env.SECRET_KEY,
-    { expiresIn: 2 * 60 },
+    { expiresIn: 5 * 60 }, // 5 min
     { algorithm: 'HS256' }
   );
 
