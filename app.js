@@ -22,7 +22,8 @@ app.use('/api/courses', require('./routes/courses.route'));
 // all url above if not match then into default url under 
 app.use((req, res, next) => {
     res.status(404).send({
-        error_message: 'Endpoint not found!'
+        error: true,
+        message: 'Endpoint not found!'
     })
 });
 
@@ -30,8 +31,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     console.error(err.stack)
     res.status(500).send({
-        message: 'Error!',
-        errors: err
+        error: true,
+        message: 'Error! ' + err,
     })
 });
 

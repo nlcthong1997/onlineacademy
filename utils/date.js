@@ -6,11 +6,11 @@ module.exports = {
     const yyyy = today.getFullYear();
     
     const sevenEarlierDay = new Date();
-    sevenEarlierDay.setDate(today.getDate - 7);
-    const edd = sevenEarlierDay.getDate();
-    const emm = sevenEarlierDay.getMonth() + 1;
-    const eyyyy = sevenEarlierDay.getFullYear();
+    sevenEarlierDay.setDate(today.getDate() - 7);
+    const eDd = sevenEarlierDay.getDate();
+    const eMm = sevenEarlierDay.getMonth() + 1;
+    const eYyyy = sevenEarlierDay.getFullYear();
 
-    return [eyyyy+'-'+emm+'-'+edd, yyyy+'-'+mm+'-'+dd]
+    return [eYyyy+'-'+eMm+'-'+eDd, yyyy+'-'+mm+'-'+dd]
   }
 }
