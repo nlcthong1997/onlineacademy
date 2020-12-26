@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const d = require('../utils/date');
+const cv = require('../utils/convert');
 const coursesModel = require('../models/course.model');
 
 router.get('/highlights-last-week', async (req, res) => {
@@ -52,6 +53,9 @@ router.get('/most-subscribed', async (req, res) => {
 
 router.get('/search', async (req, res) => {
   let q = req.query.q || '';
+  q = cv.removeVietnameseTones(q);
+  q = q.toLowerCase();
+
   let limit = req.query.limit || 10;
   let offset = req.query.offset || 0;
   let rank = req.query.rank || 'asc';
