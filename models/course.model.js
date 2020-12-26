@@ -1,4 +1,4 @@
-const { limit } = require('../utils/database');
+const { limit, offset, orderBy } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
@@ -56,5 +56,22 @@ module.exports = {
         return null;
       }
       return subscribed;
+  },
+
+  search: async (q, limit, offset, rank) => {
+    const courses = await db('courses')
+      .select('courses.*', {category_name: 'categories.name'})
+      .leftJoin('categories', 'categories.id', 'courses.categories_id')
+      .whereRaw('LOWER(??) like ?', ['courses.title', `%${q}%`])
+      .orWhereRaw('LOWER(??) like ?', ['courses.name', `%${q}%`])
+      .orWhereRaw('LOWER(??) like ?', ['categories.name', `%${q}%`])
+      .orderBy('courses.id', rank)
+      .limit(limit)
+      .offset(offset)
+    
+    if (courses.length === 0) {
+      return null;
+    }
+    return courses;
   }
 }

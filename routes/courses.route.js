@@ -50,4 +50,18 @@ router.get('/most-subscribed', async (req, res) => {
   return res.status(200).json(subscribedCourses);
 });
 
+router.get('/search', async (req, res) => {
+  let q = req.query.q || '';
+  let limit = req.query.limit || 10;
+  let offset = req.query.offset || 0;
+  let rank = req.query.rank || 'asc';
+  const result = await coursesModel.search(q, limit, offset, rank);
+  if (result === null) {
+    return res.status(204).json({
+      message: 'No content!'
+    });
+  }
+  return res.status(200).json(result)
+});
+
 module.exports = router;
