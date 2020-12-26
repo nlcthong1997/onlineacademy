@@ -1,4 +1,3 @@
-const { limit } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
       .where('categories.id', id)
       .limit(limit)
       .offset(offset)
-      
+
     if (courses.length === 0) {
       return null;
     }

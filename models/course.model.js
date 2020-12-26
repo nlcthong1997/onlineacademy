@@ -1,4 +1,3 @@
-const { limit, offset, orderBy } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
