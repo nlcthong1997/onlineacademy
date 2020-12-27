@@ -1,0 +1,27 @@
+MIGRATION
+1/init knex migration: 
+    knex init
+2/make migration: 
+    knex migrate:make migration_name
+3/run migration
+    knex migrate:latest
+    knex migrate:latest --env production
+4/rollback
+    knex migrate:rollback
+    knex migrate:rollback --all
+
+
+SEED-DATA
+1/in your knexfile.js for the current environment add items seeds
+    development: {
+        client: ...,
+        connection: { ... },
+        seeds: {
+            directory: './seeds/dev'
+        }
+    }
+2/make seed
+    knex seed:make seed_name
+3/run seed
+    knex seed:run
+    knex seed:run --specific=seed-filename.js
