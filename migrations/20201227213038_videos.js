@@ -1,10 +1,10 @@
 
 exports.up = (knex, Promise) => {
   return knex.schema
-    .createTable('videos', function (table) {
+    .createTable('videos', (table) => {
       table.increments('id').primary();
       table.json('urls').nullable();
-      table.integer('views').defaultTo(0).nullable()
+      table.integer('views').defaultTo(0).nullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
     });
 };

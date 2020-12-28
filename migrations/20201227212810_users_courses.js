@@ -1,7 +1,7 @@
 
 exports.up = (knex, Promise) => {
   return knex.schema
-    .createTable('users_courses', function (table) {
+    .createTable('users_courses', (table) => {
       table.increments('id').primary();
       table.integer('users_id').notNull();
       table.integer('courses_id').notNull();

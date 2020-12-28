@@ -1,7 +1,7 @@
 
 exports.up = (knex, Promise) => {
   return knex.schema
-    .createTable('slides', function (table) {
+    .createTable('slides', (table) => {
       table.increments('id').primary();
       table.json('urls').nullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());

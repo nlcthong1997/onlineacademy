@@ -1,7 +1,7 @@
 
 exports.up = (knex, Promise) => {
   return knex.schema
-    .createTable('categories', function (table) {
+    .createTable('categories', (table) => {
       table.increments('id').primary();
       table.string('name', 300).notNull();
       table.string('search_name', 300).notNull()

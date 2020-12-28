@@ -4,6 +4,23 @@ const router = express.Router();
 const d = require('../utils/date');
 const cv = require('../utils/convert');
 const coursesModel = require('../models/course.model');
+const feedbackModel = require('../models/feedback.model');
+const loveListModel = require('../models/love_list.model');
+const auth = require('../middlewares/auth.mdw');
+
+router.get('/:courseId(\\d+)', async (req, res) => {
+  let id = req.params.courseId;
+  const course = await coursesModel.findById(id);
+  let recommendLimit = 5;
+  const recommend = await coursesModel.recommendCourses(id, recommendLimit);
+  const feedbacks = await feedbackModel.feedbacksByCourseId(id);
+
+  return res.status(200).json({
+    course: course || [], 
+    recommend: recommend || [], 
+    feedbacks: feedbacks || []
+  });
+});
 
 router.get('/highlights-last-week', async (req, res) => {
   let limit = req.query.limit || 4;
@@ -66,6 +83,64 @@ router.get('/search', async (req, res) => {
     });
   }
   return res.status(200).json(result)
+});
+
+router.post('/love-list', auth, async (req, res) => {
+  const { userId } = req.accessTokenPayload;
+  const courseId = req.body.courseId || 0;
+  if (courseId === 0) {
+    return res.status(400).json({
+      error: true,
+      message: 'Missing data!'
+    });
+  }
+
+  let data = {
+    users_id: userId, 
+    courses_id: courseId
+  }
+
+  let isValid = await loveListModel.isValid(data);
+  if (isValid) {
+    return res.status(409).json({
+      error: true,
+      message: 'The course exists in the list!'
+    });
+  }
+
+  let id = await loveListModel.add(data);
+  return res.status(200).json({
+    id,
+    message: 'Successfully.'
+  });
+});
+
+router.delete('/love-list', auth, async (req, res) => {
+  const { userId } = req.accessTokenPayload;
+  const courseId = req.body.courseId || 0;
+  if (courseId === 0) {
+    return res.status(400).json({
+      error: true,
+      message: 'Missing data!'
+    });
+  }
+
+  let bool = await loveListModel.delete({
+    users_id: userId, 
+    courses_id: courseId
+  });
+
+  if (bool) {
+    res.status(200).json({
+      message: 'Deleted.'
+    });
+  } else {
+    res.status(200).json({
+      message: 'Delete failed'
+    });
+  }
+
+  return res;
 });
 
 module.exports = router;

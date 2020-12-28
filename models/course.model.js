@@ -1,6 +1,14 @@
 const db = require('../utils/database');
 
 module.exports = {
+  findById: async (id) => {
+    const list = await db('courses').where('id', id);
+    if (list.length === 0) {
+      return null;
+    }
+    return list[0];
+  },
+
   highlightCourse: async (dates, limit) => {
     //SELECT DISTINCT(c.id) FROM `courses` as c LEFT JOIN `users_courses` as uc ON c.id = uc.courses_id WHERE uc.created_at BETWEEN '2020-12-14 00:00:00' AND '2020-12-19 00:00:00' LIMIT 10
     const highlights = await db('courses')
@@ -71,5 +79,17 @@ module.exports = {
       return null;
     }
     return courses;
+  },
+
+  recommendCourses: async (id, recommendLimit) => {
+    const recommendCourses = await db('courses')
+      .whereRaw('categories_id = (SELECT categories_id FROM courses WHERE id = ?)', id)
+      .andWhere('id', '<>', id)
+      .limit(recommendLimit)
+    
+    if (recommendCourses.length === 0) {
+      return null;
+    }
+    return recommendCourses;
   }
 }
