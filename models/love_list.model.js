@@ -17,7 +17,7 @@ module.exports = {
     return ids[0];
   },
 
-  delete: async (condition) => {
+  delete: (condition) => {
     return db('love_list').where(condition).del();
   },
 

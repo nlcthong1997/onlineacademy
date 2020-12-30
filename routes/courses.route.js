@@ -3,15 +3,21 @@ const router = express.Router();
 
 const d = require('../utils/date');
 const cv = require('../utils/convert');
+
 const coursesModel = require('../models/course.model');
 const feedbackModel = require('../models/feedback.model');
 const loveListModel = require('../models/love_list.model');
+const userCourseModel = require('../models/user_course.model');
+
 const auth = require('../middlewares/auth.mdw');
+const validate = require('../middlewares/validate.mdw');
+const purchaseSchema = require('../schemas/purchase.json');
+const feedbackSchema = require('../schemas/feedback.json');
 
 router.get('/:courseId(\\d+)', async (req, res) => {
   let id = req.params.courseId;
   const course = await coursesModel.findById(id);
-  let recommendLimit = 5;
+  const recommendLimit = 5;
   const recommend = await coursesModel.recommendCourses(id, recommendLimit);
   const feedbacks = await feedbackModel.feedbacksByCourseId(id);
 
@@ -86,8 +92,8 @@ router.get('/search', async (req, res) => {
 });
 
 router.post('/love-list', auth, async (req, res) => {
-  const { userId } = req.accessTokenPayload;
-  const courseId = req.body.courseId || 0;
+  let { userId } = req.accessTokenPayload;
+  let courseId = req.body.courseId || 0;
   if (courseId === 0) {
     return res.status(400).json({
       error: true,
@@ -116,8 +122,8 @@ router.post('/love-list', auth, async (req, res) => {
 });
 
 router.delete('/love-list', auth, async (req, res) => {
-  const { userId } = req.accessTokenPayload;
-  const courseId = req.body.courseId || 0;
+  let { userId } = req.accessTokenPayload;
+  let courseId = req.body.courseId || 0;
   if (courseId === 0) {
     return res.status(400).json({
       error: true,
@@ -141,6 +147,58 @@ router.delete('/love-list', auth, async (req, res) => {
   }
 
   return res;
+});
+
+router.get('/registered', auth, async (req, res) => {
+  let { userId } = req.accessTokenPayload;
+  const registered = await coursesModel.userRegistered(userId);
+  if (registered === null) {
+    return res.status(204).json({
+      error: true,
+      message: 'No content!'
+    });
+  }
+  return res.status(200).json(registered);
+});
+
+router.post('/buy', auth, validate(purchaseSchema), async (req, res) => {
+  let { userId } = req.accessTokenPayload;
+  let { courseId, amount } = req.body;
+  let userCourse = {
+    users_id: userId,
+    courses_id: courseId,
+  };
+
+  //handle api pay
+  
+  let isValid = await userCourseModel.isValid(userCourse);
+  if (isValid) {
+    return res.status(409).json({
+      error: true,
+      message: "This course has been registered"
+    });
+  }
+  
+  const userCourseId = await userCourseModel.add({...userCourse, amount});
+  return res.status(200).json({userCourseId});
+});
+
+router.post('/feed-back', auth, validate(feedbackSchema), async (req, res) => {
+  let { userId } = req.accessTokenPayload;
+  let { courseId, comment } = req.body;
+  let userFeedback = {
+    courses_id: courseId,
+    users_id: userId
+  };
+  let isValidUserRegisteredCourse = await userCourseModel.isValid(userFeedback);
+  if (isValidUserRegisteredCourse) {
+    return res.status(409).json({
+      error: true,
+      message: 'You cannot respond to this course'
+    });
+  }
+  const userFeedbackId = await feedbackModel.add({...userFeedback, comment});
+  return res.status(200).json({userFeedbackId});
 });
 
 module.exports = router;

@@ -11,6 +11,11 @@ module.exports = {
       return null;
     }
     return feedbacks;
+  },
+
+  add: async (userFeedback) => {
+    const ids = db('feedbacks').insert(userFeedback);
+    return ids[0];
   }
 
 }

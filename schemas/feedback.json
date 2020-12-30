@@ -1,0 +1,13 @@
+{
+  "required": ["courseId", "comment"],
+  "properties": {
+    "courseId": {
+      "type": "integer"
+    },
+    "comment": {
+      "type": "string",
+      "minLength": 5
+    }
+  },
+  "additionalProperties": false
+}

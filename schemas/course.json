@@ -1,33 +1,33 @@
 {
     "required": [],
     "properties": {
-        "img": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "desc": {
-            "type": "string"
-        },
-        "long_desc": { 
-            "type": "string" 
-        },
-        "email": {
-            "format": "email"
-        },
-        "point": {
-            "type": "integer"
-        },
-        "qty_desc": {
-            "type": "integer"
-        },
-        "qty_register": {
-            "type": "integer"
-        },
-        "category_id": {
-            "type": "integer"
-        }
+      "img": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "desc": {
+        "type": "string"
+      },
+      "long_desc": {
+        "type": "string"
+      },
+      "email": {
+        "format": "email"
+      },
+      "point": {
+        "type": "integer"
+      },
+      "qty_desc": {
+        "type": "integer"
+      },
+      "qty_register": {
+        "type": "integer"
+      },
+      "category_id": {
+        "type": "integer"
+      }
     },
     "additionalProperties": false
 }

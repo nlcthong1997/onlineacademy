@@ -91,5 +91,16 @@ module.exports = {
       return null;
     }
     return recommendCourses;
+  },
+
+  userRegistered: async (userId) => {
+    const registered = await db('courses')
+      .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
+      .where('users_courses.users_id', userId)
+
+    if (registered.length === 0) {
+      return null;
+    }
+    return registered;
   }
 }
