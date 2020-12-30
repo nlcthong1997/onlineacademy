@@ -102,5 +102,10 @@ module.exports = {
       return null;
     }
     return registered;
+  },
+
+  add: async (course) => {
+    const ids = await db('courses').insert(course);
+    return ids[0];
   }
 }

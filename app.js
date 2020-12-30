@@ -19,6 +19,7 @@ app.use('/api/users', require('./routes/user.route'));
 app.use('/api/categories', require('./routes/category.route'));
 app.use('/api/courses', require('./routes/courses.route'));
 app.use('/api/love-list', auth, require('./routes/love_list.route'));
+app.use('/api/feedbacks', auth, require('./routes/feedback.route'));
 
 // all url above if not match then into default url under 
 app.use((req, res, next) => {

@@ -10,20 +10,23 @@ const loveListModel = require('../models/love_list.model');
 const userCourseModel = require('../models/user_course.model');
 
 const auth = require('../middlewares/auth.mdw');
+const authorization = require('../middlewares/authorization.mdw');
 const validate = require('../middlewares/validate.mdw');
 const purchaseSchema = require('../schemas/purchase.json');
 const feedbackSchema = require('../schemas/feedback.json');
+const createCourseSchema = require('../schemas/c_course.json');
+const updateCourseSchema = require('../schemas/u_course.json');
 
 router.get('/:courseId(\\d+)', async (req, res) => {
   let id = req.params.courseId;
-  const course = await coursesModel.findById(id);
+  let course = await coursesModel.findById(id);
   const recommendLimit = 5;
   const recommend = await coursesModel.recommendCourses(id, recommendLimit);
   const feedbacks = await feedbackModel.feedbacksByCourseId(id);
 
   return res.status(200).json({
-    course: course || [], 
-    recommend: recommend || [], 
+    course: course || [],
+    recommend: recommend || [],
     feedbacks: feedbacks || []
   });
 });
@@ -102,7 +105,7 @@ router.post('/love-list', auth, async (req, res) => {
   }
 
   let data = {
-    users_id: userId, 
+    users_id: userId,
     courses_id: courseId
   }
 
@@ -132,7 +135,7 @@ router.delete('/love-list', auth, async (req, res) => {
   }
 
   let bool = await loveListModel.delete({
-    users_id: userId, 
+    users_id: userId,
     courses_id: courseId
   });
 
@@ -170,7 +173,7 @@ router.post('/buy', auth, validate(purchaseSchema), async (req, res) => {
   };
 
   //handle api pay
-  
+
   let isValid = await userCourseModel.isValid(userCourse);
   if (isValid) {
     return res.status(409).json({
@@ -178,9 +181,9 @@ router.post('/buy', auth, validate(purchaseSchema), async (req, res) => {
       message: "This course has been registered"
     });
   }
-  
-  const userCourseId = await userCourseModel.add({...userCourse, amount});
-  return res.status(200).json({userCourseId});
+
+  const userCourseId = await userCourseModel.add({ ...userCourse, amount });
+  return res.status(200).json({ userCourseId });
 });
 
 router.post('/feed-back', auth, validate(feedbackSchema), async (req, res) => {
@@ -190,15 +193,26 @@ router.post('/feed-back', auth, validate(feedbackSchema), async (req, res) => {
     courses_id: courseId,
     users_id: userId
   };
-  let isValidUserRegisteredCourse = await userCourseModel.isValid(userFeedback);
-  if (isValidUserRegisteredCourse) {
+  let isValidUserRegistered = await userCourseModel.isValid(userFeedback);
+  if (isValidUserRegistered) {
     return res.status(409).json({
       error: true,
       message: 'You cannot respond to this course'
     });
   }
-  const userFeedbackId = await feedbackModel.add({...userFeedback, comment});
-  return res.status(200).json({userFeedbackId});
+  const userFeedbackId = await feedbackModel.add({ ...userFeedback, comment });
+  return res.status(200).json({ userFeedbackId });
+});
+
+router.post('/', authorization(['admin', 'teacher']), validate(createCourseSchema), async (req, res) => {
+  const course = req.body;
+  course.search_name = cv.removeVietnameseTones(course.search_name);
+  let courseId = await coursesModel.add(course);
+  return res.status(201).json({ id: courseId });
+});
+
+router.put('/', authorization(['admin', 'teacher']), validate(updateCourseSchema), async (req, res) => {
+
 });
 
 module.exports = router;
