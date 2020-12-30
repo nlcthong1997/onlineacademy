@@ -1,9 +1,6 @@
 {
-  "required": ["courseId", "comment"],
+  "required": ["comment"],
   "properties": {
-    "courseId": {
-      "type": "integer"
-    },
     "comment": {
       "type": "string",
       "minLength": 5

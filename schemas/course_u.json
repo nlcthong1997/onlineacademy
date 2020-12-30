@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "properties": {
+    "category_id": {
+      "type": "integer"
+    },
+    "slides_id": {
+      "type": "integer"
+    },
+    "videos_id": {
+      "type": "integer"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "teacher": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "point_evaluate": {
+      "type": "integer"
+    },
+    "qty_student_evaluate": {
+      "type": "integer"
+    },
+    "qty_student_registed": {
+      "type": "integer"
+    },
+    "img": {
+      "type": "string",
+      "maxLength": 260
+    },
+    "img_large": {
+      "type": "string",
+      "maxLength": 260
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 9999999999
+    },
+    "price_promo": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 9999999999
+    },
+    "sort_desc": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "status": {
+      "anyOf": [
+        { "enum": [ "completed", "pending" ] }
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

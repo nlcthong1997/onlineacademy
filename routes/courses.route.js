@@ -4,7 +4,7 @@ const router = express.Router();
 const d = require('../utils/date');
 const cv = require('../utils/convert');
 
-const coursesModel = require('../models/course.model');
+const courseModel = require('../models/course.model');
 const feedbackModel = require('../models/feedback.model');
 const loveListModel = require('../models/love_list.model');
 const userCourseModel = require('../models/user_course.model');
@@ -14,14 +14,14 @@ const authorization = require('../middlewares/authorization.mdw');
 const validate = require('../middlewares/validate.mdw');
 const purchaseSchema = require('../schemas/purchase.json');
 const feedbackSchema = require('../schemas/feedback.json');
-const createCourseSchema = require('../schemas/c_course.json');
-const updateCourseSchema = require('../schemas/u_course.json');
+const createCourseSchema = require('../schemas/course_c.json');
+const updateCourseSchema = require('../schemas/course_u.json');
 
 router.get('/:courseId(\\d+)', async (req, res) => {
   let id = req.params.courseId;
-  let course = await coursesModel.findById(id);
+  let course = await courseModel.findById(id);
   const recommendLimit = 5;
-  const recommend = await coursesModel.recommendCourses(id, recommendLimit);
+  const recommend = await courseModel.recommendCourses(id, recommendLimit);
   const feedbacks = await feedbackModel.feedbacksByCourseId(id);
 
   return res.status(200).json({
@@ -34,7 +34,7 @@ router.get('/:courseId(\\d+)', async (req, res) => {
 router.get('/highlights-last-week', async (req, res) => {
   let limit = req.query.limit || 4;
   let dates = d.sevenEarlierDayToCurrent();
-  const highlightsCourses = await coursesModel.highlightCourse(dates, limit);
+  const highlightsCourses = await courseModel.highlightCourse(dates, limit);
   if (highlightsCourses === null) {
     return res.status(204).json({
       message: 'Courses empty!'
@@ -45,7 +45,7 @@ router.get('/highlights-last-week', async (req, res) => {
 
 router.get('/most-view', async (req, res) => {
   let limit = req.query.limit || 10;
-  const mostViewCourses = await coursesModel.mostViewCourses(limit);
+  const mostViewCourses = await courseModel.mostViewCourses(limit);
   if (mostViewCourses === null) {
     return res.status(204).json({
       message: 'Courses empty!'
@@ -56,7 +56,7 @@ router.get('/most-view', async (req, res) => {
 
 router.get('/latest', async (req, res) => {
   let limit = req.query.limit || 10;
-  const latestCourses = await coursesModel.latestCourses(limit);
+  const latestCourses = await courseModel.latestCourses(limit);
   if (latestCourses === null) {
     return res.status(204).json({
       message: 'Courses empty!'
@@ -68,7 +68,7 @@ router.get('/latest', async (req, res) => {
 router.get('/most-subscribed', async (req, res) => {
   let limit = req.query.limit || 10;
   let dates = d.sevenEarlierDayToCurrent();
-  const subscribedCourses = await coursesModel.subscribedCourses(limit, dates);
+  const subscribedCourses = await courseModel.subscribedCourses(limit, dates);
   if (subscribedCourses === null) {
     return res.status(204).json({
       message: 'Courses empty!'
@@ -85,7 +85,7 @@ router.get('/search', async (req, res) => {
   let limit = req.query.limit || 10;
   let offset = req.query.offset || 0;
   let rank = req.query.rank || 'asc';
-  const result = await coursesModel.search(q, limit, offset, rank);
+  const result = await courseModel.search(q, limit, offset, rank);
   if (result === null) {
     return res.status(204).json({
       message: 'No content!'
@@ -94,15 +94,9 @@ router.get('/search', async (req, res) => {
   return res.status(200).json(result)
 });
 
-router.post('/love-list', auth, async (req, res) => {
+router.post('/:courseId(\\d+)/love-list', auth, async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  let courseId = req.body.courseId || 0;
-  if (courseId === 0) {
-    return res.status(400).json({
-      error: true,
-      message: 'Missing data!'
-    });
-  }
+  let courseId = req.params.courseId;
 
   let data = {
     users_id: userId,
@@ -118,21 +112,12 @@ router.post('/love-list', auth, async (req, res) => {
   }
 
   let id = await loveListModel.add(data);
-  return res.status(200).json({
-    id,
-    message: 'Successfully.'
-  });
+  return res.status(200).json({ id });
 });
 
-router.delete('/love-list', auth, async (req, res) => {
+router.delete('/:courseId(\\d+)/love-list', auth, async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  let courseId = req.body.courseId || 0;
-  if (courseId === 0) {
-    return res.status(400).json({
-      error: true,
-      message: 'Missing data!'
-    });
-  }
+  let courseId = req.params.courseId;
 
   let bool = await loveListModel.delete({
     users_id: userId,
@@ -154,7 +139,7 @@ router.delete('/love-list', auth, async (req, res) => {
 
 router.get('/registered', auth, async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  const registered = await coursesModel.userRegistered(userId);
+  const registered = await courseModel.userRegistered(userId);
   if (registered === null) {
     return res.status(204).json({
       error: true,
@@ -164,9 +149,10 @@ router.get('/registered', auth, async (req, res) => {
   return res.status(200).json(registered);
 });
 
-router.post('/buy', auth, validate(purchaseSchema), async (req, res) => {
+router.post('/:courseId(\\d+)/buy', auth, validate(purchaseSchema), async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  let { courseId, amount } = req.body;
+  let { amount } = req.body;
+  let courseId = req.params.courseId;
   let userCourse = {
     users_id: userId,
     courses_id: courseId,
@@ -186,9 +172,10 @@ router.post('/buy', auth, validate(purchaseSchema), async (req, res) => {
   return res.status(200).json({ userCourseId });
 });
 
-router.post('/feed-back', auth, validate(feedbackSchema), async (req, res) => {
+router.post('/:courseId(\\d+)/feed-back', auth, validate(feedbackSchema), async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  let { courseId, comment } = req.body;
+  let { comment } = req.body;
+  let courseId = req.params.courseId;
   let userFeedback = {
     courses_id: courseId,
     users_id: userId
@@ -205,14 +192,21 @@ router.post('/feed-back', auth, validate(feedbackSchema), async (req, res) => {
 });
 
 router.post('/', authorization(['admin', 'teacher']), validate(createCourseSchema), async (req, res) => {
-  const course = req.body;
-  course.search_name = cv.removeVietnameseTones(course.search_name);
-  let courseId = await coursesModel.add(course);
+  let course = req.body;
+  course.search_name = cv.removeVietnameseTones(course.name);
+  let courseId = await courseModel.add(course);
   return res.status(201).json({ id: courseId });
 });
 
-router.put('/', authorization(['admin', 'teacher']), validate(updateCourseSchema), async (req, res) => {
-
+router.put('/:courseId(\\d+)', authorization(['admin', 'teacher']), validate(updateCourseSchema), async (req, res) => {
+  let course = req.body;
+  if (course.hasOwnProperty('name')) {
+    course.search_name = cv.removeVietnameseTones(course.name);
+  }
+  await courseModel.update(course, req.params.courseId);
+  return res.status(200).json({
+    message: 'Update successfully.'
+  });
 });
 
 module.exports = router;

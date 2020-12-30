@@ -1,4 +1,5 @@
 {
+  "type": "object",
   "required": [
     "category_id",
     "title",
@@ -47,6 +48,12 @@
     "sort_desc": {
       "type": "string",
       "maxLength": 300
+    },
+    "status": {
+      "anyOf": [
+        { "enum": [ "completed", "pending" ] }
+      ],
+      "type": "string"
     }
   },
   "additionalProperties": false

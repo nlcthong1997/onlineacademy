@@ -6,7 +6,7 @@ const auth = require('../middlewares/auth.mdw');
 const validate = require('../middlewares/validate.mdw');
 const userSchema = require('../schemas/user.json');
 const changePwSchema = require('../schemas/change-pw.json');
-const userInfoSchema = require('../schemas/user-info.json');
+const userInfoSchema = require('../schemas/user_info.json');
 const userModel = require('../models/user.model');
 
 //register
@@ -20,7 +20,7 @@ router.post('/', validate(userSchema), async (req, res) => {
 
 //update ignore password
 router.put('/', auth, validate(userInfoSchema), async (req, res) => {
-  const { userId, role } = req.accessTokenPayload;
+  const { userId } = req.accessTokenPayload;
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({
       message: 'Missing data!'
@@ -36,7 +36,7 @@ router.put('/', auth, validate(userInfoSchema), async (req, res) => {
 //change password
 router.put('/change-password', auth, validate(changePwSchema), async (req, res) => {
   const { password, confirm_password } = req.body;
-  const { userId, role } = req.accessTokenPayload;
+  const { userId } = req.accessTokenPayload;
   if (password !== confirm_password) {
     return res.status(400).json({
       message: 'Compare password invalid!'
