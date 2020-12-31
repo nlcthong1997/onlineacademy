@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "img": {
+      "type": "string",
+      "maxLength": 260
+    }
+  },
+  "additionalProperties": false
+}

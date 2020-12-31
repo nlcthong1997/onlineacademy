@@ -1,6 +1,14 @@
 const db = require('../utils/database');
 
 module.exports = {
+  findById: async (id) => {
+    const list = await db('categories').where('id', id);
+    if (list.length === 0) {
+      return null;
+    }
+    return list[0];
+  },
+
   findAll: () => {
     return db('categories');
   },
@@ -16,6 +24,14 @@ module.exports = {
       return null;
     }
     return courses;
+  },
+
+  add: (category) => {
+    return db('categories').insert(category);
+  },
+
+  update: (category, id) => {
+    return db('categories').where('id', id).update(category);
   }
 
 

@@ -111,5 +111,19 @@ module.exports = {
 
   update: (course, courseId) => {
     return db('courses').where('id', courseId).update(course);
-  }
+  },
+
+  delete: async (condition) => {
+    return db('courses').where(condition).del();
+  },
+
+  isValidCategoriesCourses: (courseId) => {
+    const categories = db('courses').where('categories_id', courseId);
+    if (categories.length > 0) {
+      return true;
+    }
+    return false;
+  },
+
+  
 }

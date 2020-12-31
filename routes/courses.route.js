@@ -3,6 +3,7 @@ const router = express.Router();
 
 const d = require('../utils/date');
 const cv = require('../utils/convert');
+const types = require('../types/user_role');
 
 const courseModel = require('../models/course.model');
 const feedbackModel = require('../models/feedback.model');
@@ -191,14 +192,14 @@ router.post('/:courseId(\\d+)/feed-back', auth, validate(feedbackSchema), async 
   return res.status(200).json({ userFeedbackId });
 });
 
-router.post('/', authorization(['admin', 'teacher']), validate(createCourseSchema), async (req, res) => {
+router.post('/', authorization([types.ADMIN, types.TEACHER]), validate(createCourseSchema), async (req, res) => {
   let course = req.body;
   course.search_name = cv.removeVietnameseTones(course.name);
   let courseId = await courseModel.add(course);
   return res.status(201).json({ id: courseId });
 });
 
-router.put('/:courseId(\\d+)', authorization(['admin', 'teacher']), validate(updateCourseSchema), async (req, res) => {
+router.put('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), validate(updateCourseSchema), async (req, res) => {
   let course = req.body;
   if (course.hasOwnProperty('name')) {
     course.search_name = cv.removeVietnameseTones(course.name);
@@ -207,6 +208,21 @@ router.put('/:courseId(\\d+)', authorization(['admin', 'teacher']), validate(upd
   return res.status(200).json({
     message: 'Update successfully.'
   });
+});
+
+router.delete('/:courseId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
+  let id = req.params.courseId;
+  
+  let bool = courseModel.delete({id});
+  if (bool) {
+    return res.status(200).status({
+      message: 'Deleted.'
+    });
+  } else {
+    return res.status(400).status({
+      message: 'Deleted fail.'
+    });
+  }
 });
 
 module.exports = router;
