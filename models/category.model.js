@@ -32,7 +32,10 @@ module.exports = {
 
   update: (category, id) => {
     return db('categories').where('id', id).update(category);
-  }
+  },
 
+  delete: async (condition) => {
+    return db('categories').where(condition).del();
+  }
 
 }
