@@ -11,6 +11,7 @@ const courseModel = require('../models/course.model');
 const categoryModel = require('../models/category.model');
 
 const createCategorySchema = require('../schemas/category_c.json');
+const updateCategorySchema = require('../schemas/category_u.json');
 
 router.get('/', async (req, res) => {
   const categories = await categoryModel.findAll();

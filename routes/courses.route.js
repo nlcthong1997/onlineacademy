@@ -212,7 +212,6 @@ router.put('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), vali
 
 router.delete('/:courseId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
   let id = req.params.courseId;
-  
   let bool = courseModel.delete({id});
   if (bool) {
     return res.status(200).status({
