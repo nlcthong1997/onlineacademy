@@ -1,6 +1,11 @@
+const { select } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
+  findAll: () => {
+    return db('courses');
+  },
+
   findById: async (id) => {
     const list = await db('courses').where('id', id);
     if (list.length === 0) {
@@ -9,47 +14,31 @@ module.exports = {
     return list[0];
   },
 
-  highlightCourse: async (dates, limit) => {
-    //SELECT DISTINCT(c.id) FROM `courses` as c LEFT JOIN `users_courses` as uc ON c.id = uc.courses_id WHERE uc.created_at BETWEEN '2020-12-14 00:00:00' AND '2020-12-19 00:00:00' LIMIT 10
-    const highlights = await db('courses')
+  highlightCourse: (dates, limit) => {
+    return db('courses')
       .distinct('courses.id')
       .select('title', 'name', 'teacher', 'point_evaluate', 'img_large', 'price', 'sort_desc')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
       .whereBetween('users_courses.created_at', dates)
-      .limit(limit)
-    
-    if (highlights.length === 0) {
-      return null;
-    }
-    return highlights;
+      .limit(limit);
   },
 
-  mostViewCourses: async (limit) => {
-    //SELECT * FROM `courses` as c LEFT JOIN `videos` as v ON c.videos_id = v.id ORDER BY v.views DESC LIMIT 2
-    const mostViews = await db('courses')
+  mostViewCourses: (limit) => {
+    return db('courses')
+      .select('courses.*', 'videos.urls', 'videos.views')
       .leftJoin('videos', 'courses.videos_id', 'videos.id')
-      .orderBy('videos.views', 'desc')  
-      .limit(limit)
-    
-    if (mostViews.length === 0) {
-      return null;
-    }
-    return mostViews;
+      .orderBy('videos.views', 'desc')
+      .limit(limit);
   },
 
-  latestCourses: async (limit) => {
-    const latest = await db('courses')
+  latestCourses: (limit) => {
+    return db('courses')
       .orderBy('created_at', 'desc')
       .limit(limit);
-      
-    if (latest.length === 0) {
-      return null;
-    }
-    return latest;
   },
 
-  subscribedCourses: async (limit, dates) => {
-    const subscribed = await db('courses')
+  subscribedCourses: (limit, dates) => {
+    return db('courses')
       .count('courses.categories_id', { as: 'countRegistered' })
       .select('categories.name')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
@@ -57,24 +46,19 @@ module.exports = {
       .whereBetween('users_courses.created_at', dates)
       .groupBy('courses.categories_id')
       .orderBy('countRegistered', 'desc')
-      .limit(limit)
-
-      if (subscribed.length === 0) {
-        return null;
-      }
-      return subscribed;
+      .limit(limit);
   },
 
   search: async (q, limit, offset, rank) => {
     const courses = await db('courses')
-      .select('courses.*', {category_name: 'categories.name'})
+      .select('courses.*', { category_name: 'categories.name' })
       .leftJoin('categories', 'categories.id', 'courses.categories_id')
       .whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
       .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
       .orderBy('courses.id', rank)
       .limit(limit)
       .offset(offset)
-    
+
     if (courses.length === 0) {
       return null;
     }
@@ -86,7 +70,7 @@ module.exports = {
       .whereRaw('categories_id = (SELECT categories_id FROM courses WHERE id = ?)', id)
       .andWhere('id', '<>', id)
       .limit(recommendLimit)
-    
+
     if (recommendCourses.length === 0) {
       return null;
     }
@@ -125,5 +109,5 @@ module.exports = {
     return false;
   },
 
-  
+
 }

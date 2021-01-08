@@ -18,6 +18,11 @@ const feedbackSchema = require('../schemas/feedback.json');
 const createCourseSchema = require('../schemas/course_c.json');
 const updateCourseSchema = require('../schemas/course_u.json');
 
+router.get('/', async (req, res) => {
+  let courses = await courseModel.findAll();
+  return res.status(200).json(courses);
+})
+
 router.get('/:courseId(\\d+)', async (req, res) => {
   let id = req.params.courseId;
   let course = await courseModel.findById(id);
@@ -36,33 +41,18 @@ router.get('/highlights-last-week', async (req, res) => {
   let limit = req.query.limit || 4;
   let dates = d.sevenEarlierDayToCurrent();
   const highlightsCourses = await courseModel.highlightCourse(dates, limit);
-  if (highlightsCourses === null) {
-    return res.status(204).json({
-      message: 'Courses empty!'
-    });
-  }
   return res.status(200).json(highlightsCourses);
 });
 
 router.get('/most-view', async (req, res) => {
   let limit = req.query.limit || 10;
   const mostViewCourses = await courseModel.mostViewCourses(limit);
-  if (mostViewCourses === null) {
-    return res.status(204).json({
-      message: 'Courses empty!'
-    });
-  }
   return res.status(200).json(mostViewCourses);
 });
 
 router.get('/latest', async (req, res) => {
   let limit = req.query.limit || 10;
   const latestCourses = await courseModel.latestCourses(limit);
-  if (latestCourses === null) {
-    return res.status(204).json({
-      message: 'Courses empty!'
-    });
-  }
   return res.status(200).json(latestCourses);
 });
 
@@ -70,11 +60,6 @@ router.get('/most-subscribed', async (req, res) => {
   let limit = req.query.limit || 10;
   let dates = d.sevenEarlierDayToCurrent();
   const subscribedCourses = await courseModel.subscribedCourses(limit, dates);
-  if (subscribedCourses === null) {
-    return res.status(204).json({
-      message: 'Courses empty!'
-    });
-  }
   return res.status(200).json(subscribedCourses);
 });
 
