@@ -25,9 +25,17 @@ router.post('/', validate(authSchema), async (req, res) => {
     });
   }
 
+  if (!user.active) {
+    return res.json({
+      authenticated: false
+    });
+  }
+
   const accessToken = jwt.sign(
     {
       userId: user.id,
+      userName: user.username,
+      fullName: user.full_name,
       role: user.role,
     },
     process.env.SECRET_KEY,
@@ -48,8 +56,8 @@ router.post('/', validate(authSchema), async (req, res) => {
 
 router.post('/refresh', validate(tokenSchema), async (req, res) => {
   const { accessToken, refreshToken } = req.body;
-  const { userId, role } = jwt.verify(
-    accessToken, 
+  const { userId, role, userName, fullName } = jwt.verify(
+    accessToken,
     process.env.SECRET_KEY,
     { ignoreExpiration: true }
   );
@@ -58,8 +66,10 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
   if (ret === true) {
     const newAccessToken = jwt.sign(
       {
-        userId: userId,
-        role: role,
+        userId,
+        userName,
+        fullName,
+        role
       },
       process.env.SECRET_KEY,
       { expiresIn: 5 * 60 }, // 5 min
@@ -69,7 +79,7 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
     return res.status(200).json({
       accessToken: newAccessToken
     });
-  } 
+  }
 
   return res.status(400).json({
     message: 'Invalid refresh token!'

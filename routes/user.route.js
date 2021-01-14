@@ -8,14 +8,37 @@ const userSchema = require('../schemas/user.json');
 const changePwSchema = require('../schemas/change-pw.json');
 const userInfoSchema = require('../schemas/user_info.json');
 const userModel = require('../models/user.model');
+const codeMailModel = require('../models/code_email.model');
+const mailer = require('../utils/mailer');
 
 //register
 router.post('/', validate(userSchema), async (req, res) => {
   const user = req.body;
   user.password = bcrypt.hashSync(user.password, 10);
+  user.role = 'user';
   user.id = await userModel.add(user);
+
+  //add to code_mail
+
+  let optionMail = {
+    mailsTo: user.email,
+    subject: 'Kích hoạt tài khoản.',
+    text: '',
+    html: ''
+  }
+  await mailer.sendMail(optionMail);
+
   delete user.password;
   res.status(201).json(user);
+});
+
+//active account
+router.get('/active-account/:code', (req, res) => {
+  let code = req.params.code;
+  let isValid = codeMailModel.isValidateCode(code);
+  if (isValid) {
+    //update active code_mail
+  }
 });
 
 //update ignore password
