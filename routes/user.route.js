@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const randomstring = require('randomstring');
 const router = express.Router();
 
 const auth = require('../middlewares/auth.mdw');
@@ -16,15 +17,15 @@ router.post('/', validate(userSchema), async (req, res) => {
   const user = req.body;
   user.password = bcrypt.hashSync(user.password, 10);
   user.role = 'user';
-  user.id = await userModel.add(user);
+  // user.id = await userModel.add(user);
 
-  //add to code_mail
+  let code = randomstring.generate(20);
+  let id = await codeMailModel.add({ code });
 
   let optionMail = {
-    mailsTo: user.email,
-    subject: 'Kích hoạt tài khoản.',
-    text: '',
-    html: ''
+    mailsTo: 'nlcthong1997@gmail.com',//user.email,
+    subject: 'Online-Academy: Kích hoạt tài khoản.',
+    fileTemplateEmail: 'templates/emails/register_confirm.html'
   }
   await mailer.sendMail(optionMail);
 
@@ -35,10 +36,12 @@ router.post('/', validate(userSchema), async (req, res) => {
 //active account
 router.get('/active-account/:code', (req, res) => {
   let code = req.params.code;
-  let isValid = codeMailModel.isValidateCode(code);
-  if (isValid) {
-    //update active code_mail
-  }
+  // let isValid = codeMailModel.isValidateCode(code);
+  // if (isValid) {
+  //   //update active code_mail
+  // }
+  console.log('code: ', code);
+  return;
 });
 
 //update ignore password

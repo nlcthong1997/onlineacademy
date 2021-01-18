@@ -7,5 +7,10 @@ module.exports = {
       return false;
     }
     return true;
+  },
+
+  add: async (code) => {
+    const ids = await db('code_mail').insert(code);
+    return ids[0];
   }
 }
