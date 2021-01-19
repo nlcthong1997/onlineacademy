@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const randomstring = require('randomstring');
 const router = express.Router();
+require('dotenv').config();
 
 const auth = require('../middlewares/auth.mdw');
 const validate = require('../middlewares/validate.mdw');
@@ -17,15 +18,18 @@ router.post('/', validate(userSchema), async (req, res) => {
   const user = req.body;
   user.password = bcrypt.hashSync(user.password, 10);
   user.role = 'user';
-  // user.id = await userModel.add(user);
+  user.id = await userModel.add(user);
 
   let code = randomstring.generate(20);
   let id = await codeMailModel.add({ code });
 
   let optionMail = {
-    mailsTo: 'nlcthong1997@gmail.com',//user.email,
+    mailsTo: user.email,
     subject: 'Online-Academy: Kích hoạt tài khoản.',
-    fileTemplateEmail: 'templates/emails/register_confirm.html'
+    fileTemplate: '/emails/register_confirm.html',
+    replacements: {
+      link: `${process.env.APP_BASE_URL}/api/users/active-account/${id}/${code}`
+    }
   }
   await mailer.sendMail(optionMail);
 
@@ -34,14 +38,13 @@ router.post('/', validate(userSchema), async (req, res) => {
 });
 
 //active account
-router.get('/active-account/:code', (req, res) => {
+router.get('/active-account/:codeId(\\d+)/:code', async (req, res) => {
   let code = req.params.code;
-  // let isValid = codeMailModel.isValidateCode(code);
-  // if (isValid) {
-  //   //update active code_mail
-  // }
-  console.log('code: ', code);
-  return;
+  let isValid = await codeMailModel.isValidateCode(code);
+  if (isValid) {
+    await codeMailModel.update(code);
+  }
+  return res.redirect(`${process.env.CLIENT_BASE_URL}/login`)
 });
 
 //update ignore password

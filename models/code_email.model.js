@@ -2,7 +2,7 @@ const db = require('../utils/database');
 
 module.exports = {
   isValidateCode: async (code) => {
-    const list = await db('code_mail').where({ code, active: true });
+    const list = await db('code_mail').where({ code, is_available: true });
     if (list.length === 0) {
       return false;
     }
@@ -12,5 +12,9 @@ module.exports = {
   add: async (code) => {
     const ids = await db('code_mail').insert(code);
     return ids[0];
+  },
+
+  update: (code) => {
+    return db('code_mail').where('code', code).update('is_available', false);
   }
 }
