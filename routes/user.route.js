@@ -28,7 +28,7 @@ router.post('/', validate(userSchema), async (req, res) => {
     subject: 'Online-Academy: Kích hoạt tài khoản.',
     fileTemplate: '/emails/register_confirm.html',
     replacements: {
-      link: `${process.env.APP_BASE_URL}/api/users/active-account/${id}/${code}`
+      link: `${process.env.APP_BASE_URL}/api/users/active-account/${id}/${user.id}/${code}`
     }
   }
   await mailer.sendMail(optionMail);
@@ -38,11 +38,13 @@ router.post('/', validate(userSchema), async (req, res) => {
 });
 
 //active account
-router.get('/active-account/:codeId(\\d+)/:code', async (req, res) => {
+router.get('/active-account/:codeId(\\d+)/:userId(\\d+)/:code', async (req, res) => {
   let code = req.params.code;
+  let userId = req.params.userId;
   let isValid = await codeMailModel.isValidateCode(code);
   if (isValid) {
-    await codeMailModel.update(code);
+    await userModel.update({ id: userId }, { active: true });
+    await codeMailModel.update({ code }, { is_available: false });
   }
   return res.redirect(`${process.env.CLIENT_BASE_URL}/login`)
 });
@@ -56,7 +58,7 @@ router.put('/', auth, validate(userInfoSchema), async (req, res) => {
     });
   }
 
-  await userModel.update(userId, req.body);
+  await userModel.update({ id: userId }, req.body);
   return res.status(200).json({
     message: 'Update successfully.'
   });

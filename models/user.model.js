@@ -38,7 +38,7 @@ module.exports = {
     return db('users').where('id', userId).update('password', password);
   },
 
-  update: (userId, data) => {
-    return db('users').where('id', userId).update(data);
+  update: (condition, data) => {
+    return db('users').where(condition).update(data);
   }
 }

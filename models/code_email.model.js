@@ -14,7 +14,7 @@ module.exports = {
     return ids[0];
   },
 
-  update: (code) => {
-    return db('code_mail').where('code', code).update('is_available', false);
+  update: (condition, data) => {
+    return db('code_mail').where(condition).update(data);
   }
 }
