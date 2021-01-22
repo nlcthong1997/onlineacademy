@@ -28,7 +28,7 @@ router.post('/', validate(userSchema), async (req, res) => {
     subject: 'Online-Academy: Kích hoạt tài khoản.',
     fileTemplate: '/emails/register_confirm.html',
     replacements: {
-      link: `${process.env.APP_BASE_URL}/api/users/active-account/${id}/${user.id}/${code}`
+      link: `${process.env.APP_BASE_URL}/users/active-account/${id}/${user.id}/${code}`
     }
   }
   await mailer.sendMail(optionMail);

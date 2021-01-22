@@ -14,6 +14,17 @@ module.exports = {
     return users[0];
   },
 
+  find: async (condition) => {
+    let raw = await db('users').where(condition);
+    if (raw.length === 0) {
+      return null;
+    }
+    if (raw.length === 1) {
+      return raw[0];
+    }
+    return raw;
+  },
+
   findByUserName: async (username) => {
     const users = await db('users').where('username', username);
     if (users.length === 0) {
@@ -27,7 +38,7 @@ module.exports = {
   },
 
   isValidRefreshToken: async (userId, refreshToken) => {
-    const result = await db('users').where({ id: userId, refresh_token: refreshToken });
+    let result = await db('users').where({ id: userId, refresh_token: refreshToken });
     if (result.length > 0) {
       return true;
     }
@@ -40,5 +51,14 @@ module.exports = {
 
   update: (condition, data) => {
     return db('users').where(condition).update(data);
-  }
+  },
+
+  // isValidGoogleEmail: async (email, ggid) => {
+  //   let result = await db('users').where('email', email);
+  //   console.log('res: ', result);
+  //   if (result.length > 0) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
 }
