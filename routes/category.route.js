@@ -29,13 +29,16 @@ router.get('/:categoryId(\\d+)/courses', async (req, res) => {
   let limit = req.query.limit || 10;
   let offset = req.query.offset || 0;
 
-  const courses = await categoryModel.getCoursesByCategoryId(id, limit, offset);
+  const { courses, total, qty, page } = await categoryModel.getCoursesByCategoryId(id, limit, offset);
   if (courses === null) {
     return res.status(204).json({
       message: 'Courses empty!'
     });
   }
-  return res.status(200).json(courses);
+  return res.status(200).json({
+    courses,
+    paginate: { total, qty, page }
+  });
 });
 
 router.post('/', authorization([types.ADMIN]), validate(createCategorySchema), async (req, res) => {
