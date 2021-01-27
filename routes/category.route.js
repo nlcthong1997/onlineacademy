@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+require('dotenv');
 
 const cv = require('../utils/convert');
 const types = require('../types/user_role');
@@ -26,18 +27,21 @@ router.get('/:categoryId(\\d+)', async (req, res) => {
 
 router.get('/:categoryId(\\d+)/courses', async (req, res) => {
   let id = req.params.categoryId;
-  let limit = req.query.limit || 10;
-  let offset = req.query.offset || 0;
-
-  const { courses, total, qty, page } = await categoryModel.getCoursesByCategoryId(id, limit, offset);
-  if (courses === null) {
-    return res.status(204).json({
-      message: 'Courses empty!'
-    });
-  }
+  let limit = +req.query.limit || 5;
+  let page = +req.query.page || 1;
+  let offset = (page - 1) * limit;
+  let { courses, total } = await categoryModel.getCoursesByCategoryId(id, limit, offset);
   return res.status(200).json({
     courses,
-    paginate: { total, qty, page }
+    paginate: {
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      limit,
+      qty: courses.length,
+      currentPage: page,
+      uri: `/categories/${id}/courses?`,
+      baseUrl: process.env.APP_BASE_URL
+    }
   });
 });
 

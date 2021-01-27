@@ -90,7 +90,6 @@ router.post('/google', validate(authGoogleSchema), async (req, res) => {
       role: 'user',
       full_name: name,
       ggid: sub,
-      active: true,
     }
     await userModel.add(info);
     resToken = await handleToken.token(info);

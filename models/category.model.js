@@ -19,16 +19,16 @@ module.exports = {
       .where('categories.id', id)
       .count('courses.id', { as: 'total' });
 
-    const courses = await await db('categories')
+    const courses = await db('categories')
       .leftJoin('courses', 'courses.categories_id', 'categories.id')
       .where('categories.id', id)
       .limit(limit)
-      .offset(offset)
+      .offset(offset);
 
-    if (courses.length === 0) {
-      return null;
-    }
-    return { courses, total: count[0]['total'], qty: +limit, page: +(offset + 1) };
+    return {
+      courses,
+      total: count[0]['total']
+    };
   },
 
   add: (category) => {

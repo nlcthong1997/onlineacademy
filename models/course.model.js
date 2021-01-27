@@ -2,8 +2,13 @@ const { select } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
-  findAll: () => {
-    return db('courses');
+  findAll: async (limit, offset) => {
+    let count = await db('courses').count('id', { as: 'total' });
+    let courses = await db('courses').orderBy('name', 'asc').limit(limit).offset(offset);
+    return {
+      courses,
+      total: count[0]['total']
+    };
   },
 
   findById: async (id) => {
@@ -50,7 +55,14 @@ module.exports = {
   },
 
   search: async (q, limit, offset, rank) => {
-    const courses = await db('courses')
+    let count = await db('courses')
+      .select('courses.*', { category_name: 'categories.name' })
+      .leftJoin('categories', 'categories.id', 'courses.categories_id')
+      .whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
+      .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
+      .count('courses.id', { as: 'total' });
+
+    let courses = await db('courses')
       .select('courses.*', { category_name: 'categories.name' })
       .leftJoin('categories', 'categories.id', 'courses.categories_id')
       .whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
@@ -59,10 +71,10 @@ module.exports = {
       .limit(limit)
       .offset(offset)
 
-    if (courses.length === 0) {
-      return null;
+    return {
+      courses,
+      total: count[0]['total']
     }
-    return courses;
   },
 
   recommendCourses: async (id, recommendLimit) => {

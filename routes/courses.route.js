@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+require('dotenv');
 
 const d = require('../utils/date');
 const cv = require('../utils/convert');
@@ -19,8 +20,22 @@ const createCourseSchema = require('../schemas/course_c.json');
 const updateCourseSchema = require('../schemas/course_u.json');
 
 router.get('/', async (req, res) => {
-  let courses = await courseModel.findAll();
-  return res.status(200).json(courses);
+  let limit = +req.query.limit || 5;
+  let page = +req.query.page || 1;
+  let offset = (page - 1) * limit;
+  let { courses, total } = await courseModel.findAll(limit, offset);
+  return res.status(200).json({
+    courses,
+    paginate: {
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      limit,
+      qty: courses.length,
+      currentPage: page,
+      baseUrl: process.env.APP_BASE_URL,
+      uri: '/courses?'
+    }
+  });
 })
 
 router.get('/:courseId(\\d+)', async (req, res) => {
@@ -41,26 +56,26 @@ router.get('/highlights-last-week', async (req, res) => {
   let limit = req.query.limit || 4;
   let dates = d.sevenEarlierDayToCurrent();
   const highlightsCourses = await courseModel.highlightCourse(dates, limit);
-  return res.status(200).json(highlightsCourses);
+  return res.status(200).json({ courses: highlightsCourses });
 });
 
 router.get('/most-view', async (req, res) => {
   let limit = req.query.limit || 10;
   const mostViewCourses = await courseModel.mostViewCourses(limit);
-  return res.status(200).json(mostViewCourses);
+  return res.status(200).json({ courses: mostViewCourses });
 });
 
 router.get('/latest', async (req, res) => {
   let limit = req.query.limit || 10;
   const latestCourses = await courseModel.latestCourses(limit);
-  return res.status(200).json(latestCourses);
+  return res.status(200).json({ courses: latestCourses });
 });
 
 router.get('/most-subscribed', async (req, res) => {
   let limit = req.query.limit || 10;
   let dates = d.sevenEarlierDayToCurrent();
   const subscribedCourses = await courseModel.subscribedCourses(limit, dates);
-  return res.status(200).json(subscribedCourses);
+  return res.status(200).json({ courses: subscribedCourses });
 });
 
 router.get('/search', async (req, res) => {
@@ -68,16 +83,23 @@ router.get('/search', async (req, res) => {
   q = cv.removeVietnameseTones(q);
   q = q.toLowerCase();
 
-  let limit = req.query.limit || 10;
-  let offset = req.query.offset || 0;
+  let limit = req.query.limit || 5;
+  let page = req.query.page || 1;
+  let offset = (page - 1) * limit;
   let rank = req.query.rank || 'asc';
-  const result = await courseModel.search(q, limit, offset, rank);
-  if (result === null) {
-    return res.status(204).json({
-      message: 'No content!'
-    });
-  }
-  return res.status(200).json(result)
+  let { courses, total } = await courseModel.search(q, limit, offset, rank);
+  return res.status(200).json({
+    courses,
+    paginate: {
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      limit,
+      qty: courses.length,
+      currentPage: page,
+      baseUrl: process.env.APP_BASE_URL,
+      uri: `/courses/search?q=${q}`
+    }
+  })
 });
 
 router.post('/:courseId(\\d+)/love-list', auth, async (req, res) => {
@@ -197,7 +219,7 @@ router.put('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), vali
 
 router.delete('/:courseId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
   let id = req.params.courseId;
-  let bool = courseModel.delete({id});
+  let bool = courseModel.delete({ id });
   if (bool) {
     return res.status(200).status({
       message: 'Deleted.'
