@@ -83,8 +83,8 @@ router.get('/search', async (req, res) => {
   q = cv.removeVietnameseTones(q);
   q = q.toLowerCase();
 
-  let limit = req.query.limit || 5;
-  let page = req.query.page || 1;
+  let limit = +req.query.limit || 5;
+  let page = +req.query.page || 1;
   let offset = (page - 1) * limit;
   let rank = req.query.rank || 'asc';
   let { courses, total } = await courseModel.search(q, limit, offset, rank);
