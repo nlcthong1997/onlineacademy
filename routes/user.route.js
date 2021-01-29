@@ -13,9 +13,23 @@ const userModel = require('../models/user.model');
 const codeMailModel = require('../models/code_email.model');
 const mailer = require('../utils/mailer');
 
+router.get('/info', auth, async (req, res) => {
+  let payload = req.accessTokenPayload;
+  let user = await userModel.findById(payload.userId);
+  if (user === null) {
+    return res.status(400); //user not exist => client logout => return status error 400
+  }
+  delete user.password;
+  delete user.ggid;
+  delete user.active;
+  delete user.refresh_token;
+
+  return res.status(200).json(user);
+});
+
 //register
 router.post('/', validate(userSchema), async (req, res) => {
-  const user = req.body;
+  let user = req.body;
   user.password = bcrypt.hashSync(user.password, 10);
   user.role = 'user';
   user.id = await userModel.add(user);
@@ -32,7 +46,6 @@ router.post('/', validate(userSchema), async (req, res) => {
     }
   }
   await mailer.sendMail(optionMail);
-
   delete user.password;
   res.status(201).json(user);
 });
@@ -59,7 +72,7 @@ router.put('/', auth, validate(userInfoSchema), async (req, res) => {
   }
 
   await userModel.update({ id: userId }, req.body);
-  return res.status(200).json({
+  return res.status(201).json({
     message: 'Update successfully.'
   });
 });
@@ -76,7 +89,7 @@ router.put('/change-password', auth, validate(changePwSchema), async (req, res) 
   password = bcrypt.hashSync(password, 10);
   await userModel.updatePassword(userId, password);
 
-  return res.status(200).json({
+  return res.status(201).json({
     message: 'Change password successfully.'
   });
 });

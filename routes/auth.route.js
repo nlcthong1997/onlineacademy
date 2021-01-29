@@ -34,26 +34,6 @@ router.post('/', validate(authSchema), async (req, res) => {
     });
   }
 
-  // const accessToken = jwt.sign(
-  //   {
-  //     userId: user.id,
-  //     userName: user.username,
-  //     fullName: user.full_name,
-  //     role: user.role,
-  //   },
-  //   process.env.SECRET_KEY,
-  //   { expiresIn: 5 * 60 }, // 5 min
-  //   { algorithm: 'HS256' }
-  // );
-
-  // const refreshToken = randomstring.generate();
-  // await userModel.updateRefreshToken(user.id, refreshToken);
-
-  // return res.status(200).json({
-  //   authenticated: true,
-  //   accessToken,
-  //   refreshToken
-  // });
   let {
     authenticated,
     accessToken,
@@ -81,6 +61,7 @@ router.post('/google', validate(authGoogleSchema), async (req, res) => {
   let resToken = {};
 
   let user = await userModel.find({ email });
+  // user new -> creat
   if (user === null) {
     let password = bcrypt.hashSync(randomstring.generate(10), 10);
     let info = {
@@ -93,7 +74,7 @@ router.post('/google', validate(authGoogleSchema), async (req, res) => {
     }
     await userModel.add(info);
     resToken = await handleToken.token(info);
-
+    //user old -> update
   } else if (user.ggid === '') {
     await userModel.update({ id: user.id }, { ggid: sub });
     resToken = await handleToken.token({
@@ -102,12 +83,12 @@ router.post('/google', validate(authGoogleSchema), async (req, res) => {
       full_name: user.full_name,
       role: user.role
     });
-
+    // user invalid
   } else if (user.ggid !== '' && user.ggid !== sub) {
     return res.json({
       authenticated: false
     });
-
+    // user valid
   } else {
     resToken = await handleToken.token(user)
   }
@@ -133,7 +114,7 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
         role
       },
       process.env.SECRET_KEY,
-      { expiresIn: 5 * 60 }, // 5 min
+      { expiresIn: 1 * 60 }, // 5 min
       { algorithm: 'HS256' }
     );
 
@@ -142,7 +123,7 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
     });
   }
 
-  return res.status(400).json({
+  return res.status(401).json({
     message: 'Invalid refresh token!'
   });
 
