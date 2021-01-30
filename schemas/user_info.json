@@ -10,6 +10,16 @@
     "full_name": {
       "type": "string",
       "minLength": 10
+    },
+    "address": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 11
+    },
+    "img": {
+      "type": "string"
     }
   }
 }

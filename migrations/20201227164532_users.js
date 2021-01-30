@@ -8,6 +8,9 @@ exports.up = (knex, Promise) => {
       table.string('email').unique().notNull();
       table.enu('role', ['admin', 'teacher', 'user']).defaultTo('user').notNull();
       table.string('full_name', 500).nullable();
+      table.text('address').nullable();
+      table.string('phone', 11).nullable();
+      table.text('img').nullable();
       table.text('ggid').nullable();
       table.boolean('active').defaultTo('false').notNull();
       table.text('refresh_token').nullable();

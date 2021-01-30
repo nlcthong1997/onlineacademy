@@ -114,7 +114,7 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
         role
       },
       process.env.SECRET_KEY,
-      { expiresIn: 1 * 60 }, // 5 min
+      { expiresIn: 1 * 60 }, // 1 min
       { algorithm: 'HS256' }
     );
 
