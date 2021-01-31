@@ -9,16 +9,19 @@ module.exports = (roles = ['user']) => {
           next();
         } else {
           return res.status(401).json({
+            type: 'permission_denied',
             message: 'Permission denied!'
           });
         }
       } catch (error) {
         return res.status(401).json({
+          type: 'invalid_token',
           message: 'Token invalid.'
         });
       }
     } else {
       return res.status(401).json({
+        type: 'invalid_token',
         message: 'Token not found.'
       });
     }

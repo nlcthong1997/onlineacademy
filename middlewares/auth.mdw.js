@@ -10,11 +10,13 @@ module.exports = (req, res, next) => {
       next();
     } catch (error) {
       return res.status(401).json({
+        type: 'invalid_token',
         message: 'Token invalid.'
       });
     }
   } else {
     return res.status(401).json({
+      type: 'invalid_token',
       message: 'Token not found.'
     });
   }

@@ -56,26 +56,46 @@ router.get('/highlights-last-week', async (req, res) => {
   let limit = req.query.limit || 4;
   let dates = d.sevenEarlierDayToCurrent();
   const highlightsCourses = await courseModel.highlightCourse(dates, limit);
-  return res.status(200).json({ courses: highlightsCourses });
+  if (highlightsCourses === null) {
+    return res.status(204).json({
+      message: 'No content'
+    });
+  }
+  return res.status(200).json(highlightsCourses);
 });
 
 router.get('/most-view', async (req, res) => {
   let limit = req.query.limit || 10;
   const mostViewCourses = await courseModel.mostViewCourses(limit);
-  return res.status(200).json({ courses: mostViewCourses });
+  if (mostViewCourses === null) {
+    return res.status(204).json({
+      message: 'No content'
+    });
+  }
+  return res.status(200).json(mostViewCourses);
 });
 
 router.get('/latest', async (req, res) => {
   let limit = req.query.limit || 10;
   const latestCourses = await courseModel.latestCourses(limit);
-  return res.status(200).json({ courses: latestCourses });
+  if (latestCourses === null) {
+    return res.status(204).json({
+      message: 'No content'
+    });
+  }
+  return res.status(200).json(latestCourses);
 });
 
 router.get('/most-subscribed', async (req, res) => {
   let limit = req.query.limit || 10;
   let dates = d.sevenEarlierDayToCurrent();
   const subscribedCourses = await courseModel.subscribedCourses(limit, dates);
-  return res.status(200).json({ courses: subscribedCourses });
+  if (subscribedCourses === null) {
+    return res.status(204).json({
+      message: 'No content'
+    });
+  }
+  return res.status(200).json(subscribedCourses);
 });
 
 router.get('/search', async (req, res) => {
@@ -150,7 +170,6 @@ router.get('/registered', auth, async (req, res) => {
   const registered = await courseModel.userRegistered(userId);
   if (registered === null) {
     return res.status(204).json({
-      error: true,
       message: 'No content!'
     });
   }

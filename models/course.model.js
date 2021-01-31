@@ -19,31 +19,46 @@ module.exports = {
     return list[0];
   },
 
-  highlightCourse: (dates, limit) => {
-    return db('courses')
+  highlightCourse: async (dates, limit) => {
+    const highlight = await db('courses')
       .distinct('courses.id')
       .select('title', 'name', 'teacher', 'point_evaluate', 'img_large', 'price', 'sort_desc')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
       .whereBetween('users_courses.created_at', dates)
       .limit(limit);
+
+    if (highlight.length === 0) {
+      return null;
+    }
+    return highlight;
   },
 
-  mostViewCourses: (limit) => {
-    return db('courses')
+  mostViewCourses: async (limit) => {
+    const mostView = await db('courses')
       .select('courses.*', 'videos.urls', 'videos.views')
       .leftJoin('videos', 'courses.videos_id', 'videos.id')
       .orderBy('videos.views', 'desc')
       .limit(limit);
+
+    if (mostView.length === 0) {
+      return null;
+    }
+    return mostView;
   },
 
-  latestCourses: (limit) => {
-    return db('courses')
+  latestCourses: async (limit) => {
+    const latest = await db('courses')
       .orderBy('created_at', 'desc')
       .limit(limit);
+
+    if (latest === 0) {
+      return null;
+    }
+    return latest;
   },
 
-  subscribedCourses: (limit, dates) => {
-    return db('courses')
+  subscribedCourses: async (limit, dates) => {
+    const subscribed = await db('courses')
       .count('courses.categories_id', { as: 'countRegistered' })
       .select('categories.name')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
@@ -52,6 +67,11 @@ module.exports = {
       .groupBy('courses.categories_id')
       .orderBy('countRegistered', 'desc')
       .limit(limit);
+
+    if (subscribed.length === 0) {
+      return null;
+    }
+    return subscribed;
   },
 
   search: async (q, limit, offset, rank) => {

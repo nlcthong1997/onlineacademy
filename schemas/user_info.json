@@ -17,9 +17,6 @@
     "phone": {
       "type": "string",
       "maxLength": 11
-    },
-    "img": {
-      "type": "string"
     }
   }
 }

@@ -124,6 +124,7 @@ router.post('/refresh', validate(tokenSchema), async (req, res) => {
   }
 
   return res.status(401).json({
+    type: 'invalid_refresh_token',
     message: 'Invalid refresh token!'
   });
 
