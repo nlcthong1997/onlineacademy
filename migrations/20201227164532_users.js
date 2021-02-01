@@ -10,7 +10,8 @@ exports.up = (knex, Promise) => {
       table.string('full_name', 500).nullable();
       table.text('address').nullable();
       table.string('phone', 11).nullable();
-      table.text('img').nullable();
+      table.text('img_url').nullable();
+      table.text('img_name').nullable();
       table.text('ggid').nullable();
       table.boolean('active').defaultTo('false').notNull();
       table.text('refresh_token').nullable();

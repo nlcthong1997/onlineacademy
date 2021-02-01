@@ -1,18 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const randomstring = require('randomstring');
-const path = require('path');
 const router = express.Router();
 require('dotenv').config();
-
-const multer = require('multer');
-const storage = multer.diskStorage({
-  destination: './images',
-  filename: (req, file, cb) => {
-    cb(null, 'avatar-' + file.fieldname + '-' + Date.now() + '-' + file.originalname);
-  }
-});
-const upload = multer({ storage: storage })
 
 const auth = require('../middlewares/auth.mdw');
 const validate = require('../middlewares/validate.mdw');
@@ -73,19 +63,12 @@ router.get('/active-account/:codeId(\\d+)/:userId(\\d+)/:code', async (req, res)
 });
 
 //update ignore password
-router.put('/', auth, upload.single('img'), validate(userInfoSchema), async (req, res) => {
+router.put('/', auth, validate(userInfoSchema), async (req, res) => {
   const { userId } = req.accessTokenPayload;
-  const file = req.file;
-
-  if (Object.keys(req.body).length === 0 && !file) {
+  if (Object.keys(req.body).length === 0) {
     return res.status(400).json({
       message: 'Missing data!'
     });
-  }
-
-  if (file) {
-    const pathSaved = path.join(__dirname, '../images/' + file.filename);
-    req.body.img = pathSaved;
   }
 
   await userModel.update({ id: userId }, req.body);
@@ -110,7 +93,5 @@ router.put('/change-password', auth, validate(changePwSchema), async (req, res) 
     message: 'Change password successfully.'
   });
 });
-
-
 
 module.exports = router;
