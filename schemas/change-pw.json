@@ -1,11 +1,16 @@
 {
   "type": "object",
   "required": [
+    "old_password",
     "password",
     "confirm_password"
   ],
   "additionalProperties": false,
   "properties": {
+    "old_password": {
+      "type": "string",
+      "minLength": 8
+    },
     "password": {
       "type": "string",
       "minLength": 8

@@ -79,15 +79,21 @@ router.put('/', auth, validate(userInfoSchema), async (req, res) => {
 
 //change password
 router.put('/change-password', auth, validate(changePwSchema), async (req, res) => {
-  const { password, confirm_password } = req.body;
+  const { old_password, password, confirm_password } = req.body;
   const { userId } = req.accessTokenPayload;
+  const user = await userModel.findById(userId);
+  if (!bcrypt.compareSync(old_password, user.password)) {
+    return res.status(400).json({
+      message: 'Old password invalid!'
+    });
+  }
   if (password !== confirm_password) {
     return res.status(400).json({
       message: 'Compare password invalid!'
     });
   }
-  password = bcrypt.hashSync(password, 10);
-  await userModel.updatePassword(userId, password);
+  const hashPassword = bcrypt.hashSync(password, 10);
+  await userModel.updatePassword(userId, hashPassword);
 
   return res.status(201).json({
     message: 'Change password successfully.'
