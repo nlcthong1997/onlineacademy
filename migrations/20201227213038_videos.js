@@ -3,7 +3,9 @@ exports.up = (knex, Promise) => {
   return knex.schema
     .createTable('videos', (table) => {
       table.increments('id').primary();
-      table.json('urls').nullable();
+      table.integer('courses_id').notNull();
+      table.string('name', 500).notNull();
+      table.text('url').nullable();
       table.integer('views').defaultTo(0).nullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
     });

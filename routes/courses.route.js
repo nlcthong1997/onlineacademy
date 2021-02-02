@@ -10,6 +10,7 @@ const courseModel = require('../models/course.model');
 const feedbackModel = require('../models/feedback.model');
 const loveListModel = require('../models/love_list.model');
 const userCourseModel = require('../models/user_course.model');
+const videoModel = require('../models/video.model');
 
 const auth = require('../middlewares/auth.mdw');
 const authorization = require('../middlewares/authorization.mdw');
@@ -44,6 +45,12 @@ router.get('/:courseId(\\d+)', async (req, res) => {
   const recommendLimit = 5;
   const recommend = await courseModel.recommendCourses(id, recommendLimit);
   const feedbacks = await feedbackModel.feedbacksByCourseId(id);
+
+  if (course === null) {
+    return res.status(400).json({
+      message: 'Course is not exist'
+    });
+  }
 
   return res.status(200).json({
     course: course || [],
@@ -248,6 +255,27 @@ router.delete('/:courseId(\\d+)', authorization([types.ADMIN]), async (req, res)
       message: 'Deleted fail.'
     });
   }
+});
+
+router.get('/:courseId(\\d+)/videos', auth, async (req, res) => {
+  let { role, userId } = req.accessTokenPayload;
+  let courseId = req.params.courseId;
+
+  //isValid Registered Course
+  let isValid = await userCourseModel.isValid({ users_id: userId, courses_id: courseId });
+  if (role === types.USER && !isValid) {
+    return res.status(400).json({
+      message: 'You have not registered for this course.'
+    });
+  }
+
+  let videos = await videoModel.findByCourseId(courseId);
+  if (videos === null) {
+    return res.status(204).json({
+      message: 'No videos exist'
+    });
+  }
+  return res.status(200).json(videos);
 });
 
 module.exports = router;

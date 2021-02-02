@@ -4,8 +4,6 @@ exports.up = (knex, Promise) => {
     .createTable('courses', (table) => {
       table.increments('id').primary();
       table.integer('categories_id').notNull();
-      table.integer('slides_id').nullable();
-      table.integer('videos_id').nullable();
       table.string('title', 255).notNull();
       table.string('name', 300).notNull();
       table.string('search_name', 300).notNull()
