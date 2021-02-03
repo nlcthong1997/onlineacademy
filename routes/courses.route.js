@@ -278,4 +278,16 @@ router.get('/:courseId(\\d+)/videos', auth, async (req, res) => {
   return res.status(200).json(videos);
 });
 
+router.get('/:courseId(\\d+)/video-intro', async (req, res) => {
+  let courseId = req.params.courseId;
+
+  let video = await videoModel.videoIntro(courseId);
+  if (video === null) {
+    return res.status(204).json({
+      message: 'No video exist'
+    });
+  }
+  return res.status(200).json(video);
+});
+
 module.exports = router;

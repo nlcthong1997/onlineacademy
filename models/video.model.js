@@ -7,5 +7,13 @@ module.exports = {
       return null;
     }
     return videos;
+  },
+
+  videoIntro: async (courseId) => {
+    let video = await db('videos').where('courses_id', courseId).first();
+    if (!video) {
+      return null;
+    }
+    return video;
   }
 }

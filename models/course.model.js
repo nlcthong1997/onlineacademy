@@ -35,8 +35,8 @@ module.exports = {
 
   mostViewCourses: async (limit) => {
     const mostView = await db('courses')
-      .select('courses.*', 'videos.urls', 'videos.views')
-      .leftJoin('videos', 'courses.videos_id', 'videos.id')
+      .select('courses.*', 'videos.url', 'videos.views')
+      .leftJoin('videos', 'courses.id', 'videos.courses_id')
       .orderBy('videos.views', 'desc')
       .limit(limit);
 
