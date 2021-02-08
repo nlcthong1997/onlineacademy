@@ -19,6 +19,14 @@ module.exports = {
     return list[0];
   },
 
+  findByTeacherId: async (teacher_id) => {
+    let courses = await db('courses').where('teacher_id', teacher_id);
+    if (courses.length === 0) {
+      return null;
+    }
+    return courses[0];
+  },
+
   highlightCourse: async (dates, limit) => {
     const highlight = await db('courses')
       .distinct('courses.id')

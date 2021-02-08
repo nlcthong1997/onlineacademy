@@ -280,7 +280,6 @@ router.get('/:courseId(\\d+)/videos', auth, async (req, res) => {
 
 router.get('/:courseId(\\d+)/video-intro', async (req, res) => {
   let courseId = req.params.courseId;
-
   let video = await videoModel.videoIntro(courseId);
   if (video === null) {
     return res.status(204).json({
@@ -288,6 +287,17 @@ router.get('/:courseId(\\d+)/video-intro', async (req, res) => {
     });
   }
   return res.status(200).json(video);
+});
+
+router.get('/teacher-of-courses', authorization([types.TEACHER]), async (req, res) => {
+  let { userId } = req.accessTokenPayload;
+  let courses = await courseModel.findByTeacherId(userId);
+  if (courses === null) {
+    return res.status(204).json({
+      message: 'No courses exist'
+    });
+  }
+  return res.status(200).json(courses);
 });
 
 module.exports = router;

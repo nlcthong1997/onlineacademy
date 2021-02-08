@@ -1,19 +1,18 @@
 {
   "type": "object",
   "required": [
-    "category_id",
+    "categories_id",
     "title",
     "name",
-    "teacher"
+    "teacher",
+    "price",
+    "img",
+    "img_large",
+    "sort_desc",
+    "detail_desc"
   ],
   "properties": {
-    "category_id": {
-      "type": "integer"
-    },
-    "slides_id": {
-      "type": "integer"
-    },
-    "videos_id": {
+    "categories_id": {
       "type": "integer"
     },
     "title": {
@@ -37,6 +36,12 @@
     "qty_student_registed": {
       "type": "integer"
     },
+    "price": {
+      "type": "integer"
+    },
+    "price_promo": {
+      "type": "integer"
+    },
     "img": {
       "type": "string",
       "maxLength": 260
@@ -49,9 +54,17 @@
       "type": "string",
       "maxLength": 300
     },
+    "detail_desc": {
+      "type": "string"
+    },
     "status": {
       "anyOf": [
-        { "enum": [ "completed", "pending" ] }
+        {
+          "enum": [
+            "completed",
+            "pending"
+          ]
+        }
       ],
       "type": "string"
     }
