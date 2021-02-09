@@ -24,7 +24,7 @@ module.exports = {
     if (courses.length === 0) {
       return null;
     }
-    return courses[0];
+    return courses;
   },
 
   highlightCourse: async (dates, limit) => {

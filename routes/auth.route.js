@@ -17,19 +17,19 @@ const handleToken = require('../utils/token');
 router.post('/', validate(authSchema), async (req, res) => {
   const user = await userModel.findByUserName(req.body.username);
   if (user === null) {
-    return res.json({
+    return res.status(400).json({
       authenticated: false
     });
   }
 
   if (!bcrypt.compareSync(req.body.password, user.password)) {
-    return res.json({
+    return res.status(400).json({
       authenticated: false
     });
   }
 
   if (!user.active) {
-    return res.json({
+    return res.status(400).json({
       authenticated: false
     });
   }
@@ -85,7 +85,7 @@ router.post('/google', validate(authGoogleSchema), async (req, res) => {
     });
     // user invalid
   } else if (user.ggid !== '' && user.ggid !== sub) {
-    return res.json({
+    return res.status(400).json({
       authenticated: false
     });
     // user valid

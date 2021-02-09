@@ -18,6 +18,7 @@ app.use('/api/auth', require('./routes/auth.route'));
 app.use('/api/users', require('./routes/user.route'));
 app.use('/api/categories', require('./routes/category.route'));
 app.use('/api/courses', require('./routes/courses.route'));
+app.use('/api/videos', require('./routes/videos.route'));
 app.use('/api/love-list', auth, require('./routes/love_list.route'));
 app.use('/api/feedbacks', auth, require('./routes/feedback.route'));
 

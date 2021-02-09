@@ -15,5 +15,18 @@ module.exports = {
       return null;
     }
     return video;
+  },
+
+  getMaxRank: async (courseId) => {
+    let res = await db('videos').max('rank', { as: 'rank' }).where('courses_id', courseId);
+    if (res[0].rank === null) {
+      return 0;
+    }
+    return res[0].rank;
+  },
+
+  add: async (video) => {
+    const ids = await db('videos').insert(video);
+    return ids[0];
   }
 }

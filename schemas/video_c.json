@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "courses_id",
+    "url"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "courses_id": {
+      "type": "integer"
+    },
+    "url": {
+      "type": "string"
+    }
+  }
+}
