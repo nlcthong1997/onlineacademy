@@ -28,5 +28,9 @@ module.exports = {
   add: async (video) => {
     const ids = await db('videos').insert(video);
     return ids[0];
+  },
+
+  update: (video, id) => {
+    return db('videos').where('id', id).update(video);
   }
 }

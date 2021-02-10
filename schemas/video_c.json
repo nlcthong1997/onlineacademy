@@ -3,7 +3,8 @@
   "required": [
     "name",
     "courses_id",
-    "url"
+    "url",
+    "video_name"
   ],
   "additionalProperties": false,
   "properties": {
@@ -14,6 +15,9 @@
       "type": "integer"
     },
     "url": {
+      "type": "string"
+    },
+    "video_name": {
       "type": "string"
     }
   }

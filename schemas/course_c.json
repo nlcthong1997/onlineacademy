@@ -7,7 +7,9 @@
     "teacher",
     "price",
     "img",
+    "img_name",
     "img_large",
+    "img_large_name",
     "sort_desc",
     "detail_desc"
   ],
@@ -43,12 +45,16 @@
       "type": "integer"
     },
     "img": {
-      "type": "string",
-      "maxLength": 260
+      "type": "string"
+    },
+    "img_name": {
+      "type": "string"
     },
     "img_large": {
-      "type": "string",
-      "maxLength": 260
+      "type": "string"
+    },
+    "img_large_name": {
+      "type": "string"
     },
     "sort_desc": {
       "type": "string",

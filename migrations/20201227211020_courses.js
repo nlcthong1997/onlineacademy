@@ -13,8 +13,10 @@ exports.up = (knex, Promise) => {
       table.integer('point_evaluate').nullable();
       table.integer('qty_student_evaluate').nullable();
       table.integer('qty_student_registed').nullable();
-      table.string('img', 260).nullable();
-      table.string('img_large', 260).nullable();
+      table.text('img').nullable();
+      table.text('img_name').nullable()
+      table.text('img_large').nullable();
+      table.text('img_large_name').nullable()
       table.decimal('price', 10, 2).defaultTo(0).notNull();
       table.decimal('price_promo', 10, 2).defaultTo(0).notNull();
       table.string('sort_desc', 350).nullable();

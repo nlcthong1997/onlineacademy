@@ -225,8 +225,10 @@ router.post('/:courseId(\\d+)/feed-back', auth, validate(feedbackSchema), async 
   return res.status(200).json({ userFeedbackId });
 });
 
-router.post('/', authorization([types.ADMIN, types.TEACHER]), validate(createCourseSchema), async (req, res) => {
+router.post('/', authorization([types.TEACHER]), validate(createCourseSchema), async (req, res) => {
   let course = req.body;
+  let { userId } = req.accessTokenPayload;
+  course.teacher_id = userId;
   course.search_name = cv.removeVietnameseTones(course.name);
   let courseId = await courseModel.add(course);
   return res.status(201).json({ id: courseId });
