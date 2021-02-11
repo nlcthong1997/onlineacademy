@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "courses_id",
+    "url",
+    "slide_name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "courses_id": {
+      "type": "integer"
+    },
+    "url": {
+      "type": "string"
+    },
+    "slide_name": {
+      "type": "string"
+    }
+  }
+}

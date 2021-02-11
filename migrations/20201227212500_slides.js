@@ -6,6 +6,7 @@ exports.up = (knex, Promise) => {
       table.integer('courses_id').notNull();
       table.string('name', 500).notNull();
       table.text('url').nullable();
+      table.text('slide_name').nullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
     });
 };
