@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "category_id": {
+    "categories_id": {
       "type": "integer"
     },
     "slides_id": {
@@ -31,7 +31,18 @@
     "qty_student_registed": {
       "type": "integer"
     },
+    "detail_desc": {
+      "type": "string"
+    },
     "img": {
+      "type": "string",
+      "maxLength": 260
+    },
+    "img_name": {
+      "type": "string",
+      "maxLength": 260
+    },
+    "img_large_name": {
       "type": "string",
       "maxLength": 260
     },
@@ -55,7 +66,12 @@
     },
     "status": {
       "anyOf": [
-        { "enum": [ "completed", "pending" ] }
+        {
+          "enum": [
+            "completed",
+            "pending"
+          ]
+        }
       ],
       "type": "string"
     }
