@@ -10,6 +10,7 @@ const slideModel = require('../models/slide.model');
 const authorization = require('../middlewares/authorization.mdw');
 const validate = require('../middlewares/validate.mdw');
 const createSlideSchema = require('../schemas/slide_c.json');
+const updateSlideSchema = require('../schemas/slide_u.json');
 
 router.post('/', authorization([types.TEACHER]), validate(createSlideSchema), async (req, res) => {
   let slide = req.body;
@@ -20,13 +21,13 @@ router.post('/', authorization([types.TEACHER]), validate(createSlideSchema), as
   })
 });
 
-// router.put('/:videoId', authorization([types.TEACHER]), validate(createVideoSchema), async (req, res) => {
-//   let video = req.body;
-//   let id = req.params.id;
-//   await videoModel.update(video, id);
-//   return res.status(200).json({
-//     message: 'Updated.'
-//   })
-// })
+router.put('/:slideId', authorization([types.TEACHER]), validate(updateSlideSchema), async (req, res) => {
+  let slide = req.body;
+  let id = req.params.slideId;
+  await slideModel.update(slide, id);
+  return res.status(200).json({
+    message: 'Updated.'
+  })
+})
 
 module.exports = router;

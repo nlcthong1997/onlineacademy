@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "url",
+    "slide_name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "slide_name": {
+      "type": "string"
+    }
+  }
+}
