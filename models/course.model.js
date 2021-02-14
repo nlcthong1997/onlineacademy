@@ -1,18 +1,17 @@
-const { select } = require('../utils/database');
 const db = require('../utils/database');
 
 module.exports = {
-  findAll: async (limit, offset) => {
-    let count = await db('courses').count('id', { as: 'total' });
-    let courses = await db('courses').orderBy('name', 'asc').limit(limit).offset(offset);
+  findAll: async (limit, offset, status = ['completed']) => {
+    let count = await db('courses').count('id', { as: 'total' }).whereIn('status', status);
+    let courses = await db('courses').whereIn('status', status).orderBy('name', 'asc').limit(limit).offset(offset);
     return {
       courses,
       total: count[0]['total']
     };
   },
 
-  findById: async (id) => {
-    const list = await db('courses').where('id', id);
+  findById: async (id, status = ['completed']) => {
+    const list = await db('courses').where('id', id).whereIn('status', status);
     if (list.length === 0) {
       return null;
     }
@@ -27,12 +26,13 @@ module.exports = {
     return courses;
   },
 
-  highlightCourse: async (dates, limit) => {
+  highlightCourse: async (dates, limit, status = ['completed']) => {
     const highlight = await db('courses')
       .distinct('courses.id')
       .select('title', 'name', 'teacher', 'point_evaluate', 'img_large', 'price', 'sort_desc')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
       .whereBetween('users_courses.created_at', dates)
+      .whereIn('status', status)
       .limit(limit);
 
     if (highlight.length === 0) {
@@ -54,8 +54,9 @@ module.exports = {
     return mostView;
   },
 
-  latestCourses: async (limit) => {
+  latestCourses: async (limit, status = ['completed']) => {
     const latest = await db('courses')
+      .whereIn('status', status)
       .orderBy('created_at', 'desc')
       .limit(limit);
 
@@ -65,13 +66,14 @@ module.exports = {
     return latest;
   },
 
-  subscribedCourses: async (limit, dates) => {
+  subscribedCourses: async (limit, dates, status = ['completed']) => {
     const subscribed = await db('courses')
       .count('courses.categories_id', { as: 'countRegistered' })
       .select('categories.name')
       .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
       .leftJoin('categories', 'courses.categories_id', 'categories.id')
       .whereBetween('users_courses.created_at', dates)
+      .whereIn('status', status)
       .groupBy('courses.categories_id')
       .orderBy('countRegistered', 'desc')
       .limit(limit);
@@ -82,19 +84,25 @@ module.exports = {
     return subscribed;
   },
 
-  search: async (q, limit, offset, rank) => {
+  search: async (q, limit, offset, rank, status = ['completed']) => {
     let count = await db('courses')
       .select('courses.*', { category_name: 'categories.name' })
       .leftJoin('categories', 'categories.id', 'courses.categories_id')
-      .whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
-      .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
+      .whereIn('courses.status', status)
+      .where(function () {
+        this.whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
+          .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
+      })
       .count('courses.id', { as: 'total' });
 
     let courses = await db('courses')
       .select('courses.*', { category_name: 'categories.name' })
       .leftJoin('categories', 'categories.id', 'courses.categories_id')
-      .whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
-      .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
+      .whereIn('courses.status', status)
+      .where(function () {
+        this.whereRaw('MATCH(courses.search_name) AGAINST(?)', q)
+          .orWhereRaw('MATCH(categories.search_name) AGAINST(?)', q)
+      })
       .orderBy('courses.id', rank)
       .limit(limit)
       .offset(offset)
@@ -105,10 +113,11 @@ module.exports = {
     }
   },
 
-  recommendCourses: async (id, recommendLimit) => {
+  recommendCourses: async (id, recommendLimit, status = ['completed']) => {
     const recommendCourses = await db('courses')
       .whereRaw('categories_id = (SELECT categories_id FROM courses WHERE id = ?)', id)
       .andWhere('id', '<>', id)
+      .whereIn('status', status)
       .limit(recommendLimit)
 
     if (recommendCourses.length === 0) {
@@ -137,17 +146,25 @@ module.exports = {
     return db('courses').where('id', courseId).update(course);
   },
 
-  delete: async (condition) => {
+  delete: (condition) => {
     return db('courses').where(condition).del();
   },
 
-  isValidCategoriesCourses: (courseId) => {
-    const categories = db('courses').where('categories_id', courseId);
+  isValidCategoriesCourses: async (categoryId) => {
+    const categories = await db('courses').where('categories_id', categoryId);
     if (categories.length > 0) {
+      return false;
+    }
+    return true;
+  },
+
+  isValidDelete: async (id) => {
+    let course = await db('courses').where('id', id)
+      .andWhere('qty_student_registed', null)
+      .orWhere('qty_student_registed', 0)
+    if (course.length > 0) {
       return true;
     }
     return false;
-  },
-
-
+  }
 }

@@ -32,5 +32,9 @@ module.exports = {
 
   update: (video, id) => {
     return db('videos').where('id', id).update(video);
+  },
+
+  delete: (condition) => {
+    return db('videos').where(condition).del();
   }
 }

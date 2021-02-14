@@ -64,25 +64,21 @@ router.put('/:categoryId(\\d+)', authorization([types.ADMIN]), validate(updateCa
   });
 });
 
-router.delete('/:coursesId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
+router.delete('/:categoryId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
   let id = req.params.categoryId;
   let isValid = await courseModel.isValidCategoriesCourses(id);
   if (isValid) {
-    return res.status(410).json({
-      error: true,
-      message: 'Course does not delete.'
-    });
+    let bool = await categoryModel.delete(id);
+    if (bool) {
+      return res.status(200).status({
+        message: 'Deleted.'
+      });
+    }
   }
-  let bool = await categoryModel.delete(id);
-  if (bool) {
-    return res.status(200).status({
-      message: 'Deleted.'
-    });
-  } else {
-    return res.status(400).status({
-      message: 'Deleted fail.'
-    });
-  }
+  return res.status(410).json({
+    error: true,
+    message: 'Course does not delete.'
+  });
 });
 
 module.exports = router;

@@ -246,18 +246,28 @@ router.put('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), vali
   });
 });
 
-router.delete('/:courseId(\\d+)', authorization([types.ADMIN]), async (req, res) => {
+router.delete('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), async (req, res) => {
   let id = req.params.courseId;
-  let bool = courseModel.delete({ id });
-  if (bool) {
-    return res.status(200).status({
-      message: 'Deleted.'
-    });
-  } else {
-    return res.status(400).status({
-      message: 'Deleted fail.'
-    });
+  let isValid = await courseModel.isValidDelete(id);
+  if (isValid) {
+    let course = await courseModel.findById(id, ['pending', 'completed']);
+    let isDelCourse = await courseModel.delete({ id });
+    if (isDelCourse) {
+      let videos = await videoModel.findByCourseId(id);
+      let slides = await slideModel.findByCourseId(id);
+      await videoModel.delete({ courses_id: id });
+      await slideModel.delete({ courses_id: id });
+      return res.status(200).json({
+        course: course || [],
+        videos: videos || [],
+        slides: slides || [],
+        message: 'Deleted.'
+      });
+    }
   }
+  return res.status(400).json({
+    message: 'Deleted fail.'
+  });
 });
 
 router.get('/:courseId(\\d+)/videos', auth, async (req, res) => {

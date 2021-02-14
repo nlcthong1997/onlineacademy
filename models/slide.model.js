@@ -16,5 +16,9 @@ module.exports = {
 
   update: (slide, id) => {
     return db('slides').where('id', id).update(slide);
-  }
+  },
+
+  delete: (condition) => {
+    return db('slides').where(condition).del();
+  },
 }
