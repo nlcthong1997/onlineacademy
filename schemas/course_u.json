@@ -39,16 +39,13 @@
       "maxLength": 260
     },
     "img_name": {
-      "type": "string",
-      "maxLength": 260
+      "type": "string"
     },
     "img_large_name": {
-      "type": "string",
-      "maxLength": 260
+      "type": "string"
     },
     "img_large": {
-      "type": "string",
-      "maxLength": 260
+      "type": "string"
     },
     "price": {
       "type": "number",

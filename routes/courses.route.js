@@ -184,9 +184,9 @@ router.get('/registered', auth, async (req, res) => {
   return res.status(200).json(registered);
 });
 
-router.post('/:courseId(\\d+)/buy', auth, validate(purchaseSchema), async (req, res) => {
+router.post('/:courseId(\\d+)/buy', auth, async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  let { amount } = req.body;
+  // let { amount } = req.body
   let courseId = req.params.courseId;
   let userCourse = {
     users_id: userId,
@@ -196,14 +196,13 @@ router.post('/:courseId(\\d+)/buy', auth, validate(purchaseSchema), async (req, 
   //handle api pay
 
   let isValid = await userCourseModel.isValid(userCourse);
-  if (isValid) {
+  if (!isValid) {
     return res.status(409).json({
-      error: true,
-      message: "This course has been registered"
+      message: "Bạn đã mua khóa học này."
     });
   }
 
-  const userCourseId = await userCourseModel.add({ ...userCourse, amount });
+  const userCourseId = await userCourseModel.add(userCourse);
   return res.status(200).json({ userCourseId });
 });
 
@@ -332,6 +331,28 @@ router.get('/teacher-of-courses', authorization([types.TEACHER]), async (req, re
     });
   }
   return res.status(200).json(courses);
+});
+
+router.get('/teacher-of-courses', authorization([types.TEACHER]), async (req, res) => {
+  let { userId } = req.accessTokenPayload;
+  let courses = await courseModel.findByTeacherId(userId);
+  if (courses === null) {
+    return res.status(204).json({
+      message: 'No courses exist'
+    });
+  }
+  return res.status(200).json(courses);
+});
+
+router.get('/:courseId/teacher-of-courses', authorization([types.TEACHER]), async (req, res) => {
+  let courseId = req.params.courseId;
+  let course = await courseModel.findById(courseId, ['completed', 'pending']);
+  if (course === null) {
+    return res.status(204).json({
+      message: 'No courses exist'
+    });
+  }
+  return res.status(200).json(course);
 });
 
 module.exports = router;

@@ -41,10 +41,13 @@ module.exports = {
     return highlight;
   },
 
-  mostViewCourses: async (limit) => {
+  mostViewCourses: async (limit, status = ['completed']) => {
     const mostView = await db('courses')
-      .select('courses.*', 'videos.url', 'videos.views')
+      .sum('videos.views as totalView')
+      .select('courses.*')
       .leftJoin('videos', 'courses.id', 'videos.courses_id')
+      .whereIn('courses.status', status)
+      .groupBy('videos.courses_id')
       .orderBy('videos.views', 'desc')
       .limit(limit);
 

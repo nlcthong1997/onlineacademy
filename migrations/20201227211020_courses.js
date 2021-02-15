@@ -23,6 +23,7 @@ exports.up = (knex, Promise) => {
       table.text('detail_desc').nullable();
       table.enu('status', ['completed', 'pending']).defaultTo('pending').notNull();
       table.timestamp('created_at').defaultTo(knex.fn.now());
+      table.timestamp('updated_at').defaultTo(knex.fn.now());
     });
 };
 
