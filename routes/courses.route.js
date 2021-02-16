@@ -195,7 +195,7 @@ router.post('/:courseId(\\d+)/buy', auth, async (req, res) => {
 
   //handle api pay
 
-  let isValid = await userCourseModel.isValid(userCourse);
+  let isValid = await userCourseModel.isValidBought(userCourse);
   if (!isValid) {
     return res.status(409).json({
       message: "Bạn đã mua khóa học này."
@@ -296,7 +296,7 @@ router.get('/:courseId(\\d+)/slides', auth, async (req, res) => {
 
   //isValid Registered Course
   let isValid = await userCourseModel.isValid({ users_id: userId, courses_id: courseId });
-  if (role === types.USER && !isValid) {
+  if (role === types.USER && isValid) {
     return res.status(400).json({
       message: 'You have not registered for this course.'
     });

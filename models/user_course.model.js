@@ -9,8 +9,16 @@ module.exports = {
   isValid: async (condition) => {
     const items = await db('users_courses').where(condition);
     if (items.length > 0) {
+      return true;
+    }
+    return false;
+  },
+
+  isValidBought: async (condition) => {
+    const items = await db('users_courses').where(condition);
+    if (items.length > 0) {
       return false;
     }
     return true;
-  }
+  },
 }

@@ -5,7 +5,6 @@ module.exports = {
     const list = await db('love_list')
       .leftJoin('courses', 'love_list.courses_id', 'courses.id')
       .where('users_id', userId);
-    
     if (list.length === 0) {
       return null;
     }
@@ -19,10 +18,13 @@ module.exports = {
 
   delete: (condition) => {
     return db('love_list').where(condition).del();
+
   },
 
   isValid: async (condition) => {
+
     const items = await db('love_list').where(condition);
+    console.log();
     if (items.length > 0) {
       return true;
     }
