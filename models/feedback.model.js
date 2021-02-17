@@ -22,7 +22,6 @@ module.exports = {
     const list = await db('feedbacks')
       .where({ users_id: userId, courses_id: courseId })
       .orderBy('created_at', 'desc');
-    
     if (list.length === 0) {
       return null;
     }
