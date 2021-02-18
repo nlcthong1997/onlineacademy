@@ -5,7 +5,8 @@ module.exports = {
     const feedbacks = await db('feedbacks')
       .select('users.username', 'feedbacks.*')
       .leftJoin('users', 'feedbacks.users_id', 'users.id')
-      .where('courses_id', courseId);
+      .where('courses_id', courseId)
+      .orderBy('feedbacks.created_at', 'desc')
 
     if (feedbacks.length === 0) {
       return null;
@@ -14,7 +15,7 @@ module.exports = {
   },
 
   add: async (userFeedback) => {
-    const ids = db('feedbacks').insert(userFeedback);
+    const ids = await db('feedbacks').insert(userFeedback);
     return ids[0];
   },
 
