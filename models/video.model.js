@@ -36,5 +36,10 @@ module.exports = {
 
   delete: (condition) => {
     return db('videos').where(condition).del();
+  },
+
+  updateView: async (id) => {
+    const res = await db('videos').select('views').where('id', id).first();
+    await db('videos').where('id', id).update('views', res.views + 1);
   }
 }

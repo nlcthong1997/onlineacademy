@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 
 // handling errors when use throw
 app.use((err, req, res, next) => {
+    console.error(err)
     console.error(err.stack)
     res.status(500).send({
         error: true,

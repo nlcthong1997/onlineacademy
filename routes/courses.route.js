@@ -197,7 +197,7 @@ router.post('/:courseId(\\d+)/buy', auth, async (req, res) => {
 
   let isValid = await userCourseModel.isValidBought(userCourse);
   if (!isValid) {
-    return res.status(409).json({
+    return res.status(400).json({
       message: "Bạn đã mua khóa học này."
     });
   }

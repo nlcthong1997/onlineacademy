@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const feedbackModel = require('../models/feedback.model');
+const courseModel = require('../models/course.model')
 const auth = require('../middlewares/auth.mdw');
 
 router.get('/courses/:courseId(\\d+)/user', async (req, res) => {
@@ -29,8 +30,15 @@ router.get('/courses/:courseId(\\d+)', async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   let { userId } = req.accessTokenPayload;
-  const feedback = { ...req.body, users_id: userId };
-  let id = feedbackModel.add(feedback);
+  const course = await courseModel.findById(req.body.courses_id);
+  const newPoint = course.point_evaluate + req.body.point_evaluate;
+  await courseModel.update({ point_evaluate: newPoint }, req.body.courses_id);
+  const feedback = {
+    comment: req.body.comment,
+    courses_id: req.body.courses_id,
+    users_id: userId
+  };
+  let id = await feedbackModel.add(feedback);
   return res.status(201).json({ id, message: 'Created.' });
 })
 

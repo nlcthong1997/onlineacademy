@@ -7,6 +7,7 @@ const cv = require('../utils/convert');
 const types = require('../types/user_role');
 const videoModel = require('../models/video.model');
 
+const auth = require('../middlewares/auth.mdw');
 const authorization = require('../middlewares/authorization.mdw');
 const validate = require('../middlewares/validate.mdw');
 const createVideoSchema = require('../schemas/video_c.json');
@@ -28,6 +29,14 @@ router.put('/:videoId', authorization([types.TEACHER]), validate(updateVideoSche
   let video = req.body;
   let id = req.params.videoId;
   await videoModel.update(video, id);
+  return res.status(200).json({
+    message: 'Updated.'
+  })
+})
+
+router.put('/:videoId/view', auth, async (req, res) => {
+  let id = req.params.videoId;
+  await videoModel.updateView(id);
   return res.status(200).json({
     message: 'Updated.'
   })
