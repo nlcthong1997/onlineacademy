@@ -53,12 +53,11 @@ module.exports = {
     return db('users').where(condition).update(data);
   },
 
-  // isValidGoogleEmail: async (email, ggid) => {
-  //   let result = await db('users').where('email', email);
-  //   console.log('res: ', result);
-  //   if (result.length > 0) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
+  adminFind: async (condition) => {
+    let raw = await db('users').select('id', 'username', 'phone', 'email', 'address', 'full_name', 'img_url', 'active').where(condition);
+    if (raw.length === 0) {
+      return null;
+    }
+    return raw;
+  },
 }

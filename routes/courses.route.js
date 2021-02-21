@@ -245,7 +245,7 @@ router.put('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), vali
   });
 });
 
-router.delete('/:courseId(\\d+)', authorization([types.ADMIN, types.TEACHER]), async (req, res) => {
+router.delete('/:courseId(\\d+)', authorization([types.TEACHER]), async (req, res) => {
   let id = req.params.courseId;
   let isValid = await courseModel.isValidDelete(id);
   if (isValid) {
@@ -320,17 +320,6 @@ router.get('/:courseId(\\d+)/video-intro', async (req, res) => {
     });
   }
   return res.status(200).json(video);
-});
-
-router.get('/teacher-of-courses', authorization([types.TEACHER]), async (req, res) => {
-  let { userId } = req.accessTokenPayload;
-  let courses = await courseModel.findByTeacherId(userId);
-  if (courses === null) {
-    return res.status(204).json({
-      message: 'No courses exist'
-    });
-  }
-  return res.status(200).json(courses);
 });
 
 router.get('/teacher-of-courses', authorization([types.TEACHER]), async (req, res) => {

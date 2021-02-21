@@ -8,6 +8,8 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.APP_PORT;
 const auth = require('./middlewares/auth.mdw');
+const authorization = require('./middlewares/authorization.mdw');
+const types = require('./types/user_role');
 
 app.use(morgan('dev'));
 app.use(cors());
@@ -22,6 +24,8 @@ app.use('/api/videos', require('./routes/video.route'));
 app.use('/api/slides', require('./routes/slide.route'));
 app.use('/api/love-list', auth, require('./routes/love_list.route'));
 app.use('/api/feedbacks', auth, require('./routes/feedback.route'));
+
+app.use('/api/admin', authorization([types.ADMIN]), require('./routes/admin.route'));
 
 // all url above if not match then into default url under 
 app.use((req, res, next) => {

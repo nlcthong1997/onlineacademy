@@ -4,11 +4,15 @@ const randomstring = require('randomstring');
 const router = express.Router();
 require('dotenv').config();
 
+const types = require('../types/user_role')
 const auth = require('../middlewares/auth.mdw');
+const authorization = require('../middlewares/authorization.mdw');
 const validate = require('../middlewares/validate.mdw');
 const userSchema = require('../schemas/user.json');
 const changePwSchema = require('../schemas/change-pw.json');
 const userInfoSchema = require('../schemas/user_info.json');
+const studentUpdateSchema = require('../schemas/student_u.json')
+const teacherUpdateSchema = require('../schemas/teacher_u.json')
 const userModel = require('../models/user.model');
 const codeMailModel = require('../models/code_email.model');
 const mailer = require('../utils/mailer');
@@ -97,6 +101,42 @@ router.put('/change-password', auth, validate(changePwSchema), async (req, res) 
 
   return res.status(201).json({
     message: 'Change password successfully.'
+  });
+});
+
+router.get('/students', authorization([types.ADMIN]), async (req, res) => {
+  const students = await userModel.adminFind({ role: 'user' });
+  if (students === null) {
+    return res.status(204).json({
+      message: 'Students empty.'
+    });
+  }
+  return res.status(200).json(students);
+});
+
+router.put('/students/:stdId', authorization([types.ADMIN]), validate(studentUpdateSchema), async (req, res) => {
+  const stdId = req.params.stdId;
+  await userModel.update({ id: stdId }, req.body);
+  return res.status(200).json({
+    message: 'Update successfully'
+  });
+});
+
+router.get('/teachers', authorization([types.ADMIN]), async (req, res) => {
+  const teachers = await userModel.adminFind({ role: 'teacher' });
+  if (teachers === null) {
+    return res.status(204).json({
+      message: 'Teachers empty.'
+    });
+  }
+  return res.status(200).json(teachers);
+})
+
+router.put('/teachers/:teacherId', authorization([types.ADMIN]), validate(teacherUpdateSchema), async (req, res) => {
+  const teacherId = req.params.teacherId;
+  await userModel.update({ id: teacherId }, req.body);
+  return res.status(200).json({
+    message: 'Update successfully'
   });
 });
 
