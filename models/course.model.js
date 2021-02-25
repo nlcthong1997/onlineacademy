@@ -185,5 +185,14 @@ module.exports = {
       return null;
     }
     return courses;
+  },
+
+  getQtyRegistered: async (courseId) => {
+    const res = await db('courses').select('qty_student_registed').where('id', courseId).first();
+
+    if (res.qty_student_registed === null) {
+      return 0;
+    }
+    return res.qty_student_registed;
   }
 }

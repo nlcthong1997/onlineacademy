@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.APP_PORT;
 const auth = require('./middlewares/auth.mdw');
 const authorization = require('./middlewares/authorization.mdw');
-const types = require('./types/user_role');
+let types = require('./types/user_role');
 
 app.use(morgan('dev'));
 app.use(cors());

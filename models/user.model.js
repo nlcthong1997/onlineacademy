@@ -60,4 +60,20 @@ module.exports = {
     }
     return raw;
   },
+
+  isValidEmail: async (email) => {
+    let emails = await db('users').where('email', email);
+    if (emails.length > 0) {
+      return true;
+    }
+    return false;
+  },
+
+  isValidUsername: async (username) => {
+    let usernames = await db('users').where('username', username);
+    if (usernames.length > 0) {
+      return true;
+    }
+    return false;
+  }
 }

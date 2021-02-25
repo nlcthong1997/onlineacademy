@@ -8,9 +8,10 @@ const validate = require('../middlewares/validate.mdw');
 const studentUpdateSchema = require('../schemas/student_u.json')
 const teacherUpdateSchema = require('../schemas/teacher_u.json')
 const adminUpdateCourseSchema = require('../schemas/admin_course_u.json');
-const adminDeleteCourseSchema = require('../schemas/admin_course_d.json');
+const createTeacher = require('../schemas/create_teacher.json');
 const userModel = require('../models/user.model');
 const courseModel = require('../models/course.model');
+const types = require('../types/user_role');
 
 router.get('/students', async (req, res) => {
   const students = await userModel.adminFind({ role: 'user' });
@@ -64,6 +65,32 @@ router.put('/courses/:courseId', validate(adminUpdateCourseSchema), async (req, 
   return res.status(200).json({
     message: 'Updated.'
   });
+});
+
+router.post('/teachers', validate(createTeacher), async (req, res) => {
+  const isValidUsername = await userModel.isValidUsername(req.body.username);
+  const isValidEmail = await userModel.isValidEmail(req.body.email);
+  if (isValidUsername) {
+    return res.status(400).json({
+      message: 'Tài khoản đã tồn tại'
+    })
+  }
+
+  if (isValidEmail) {
+    return res.status(400).json({
+      message: 'Email đã tồn tại'
+    })
+  }
+
+  let data = req.body;
+  data.password = bcrypt.hashSync(data.password, 10);
+  data.role = types.TEACHER;
+  data.active = true;
+
+  await userModel.add(data);
+  return res.status(201).json({
+    message: 'Tạo tài khoản thành công'
+  })
 });
 
 module.exports = router;

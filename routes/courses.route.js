@@ -202,7 +202,11 @@ router.post('/:courseId(\\d+)/buy', auth, async (req, res) => {
     });
   }
 
+  const qtyRegistered = await courseModel.getQtyRegistered(courseId);
+  await courseModel.update({ qty_student_registed: qtyRegistered + 1 }, courseId);
+
   const userCourseId = await userCourseModel.add(userCourse);
+  
   return res.status(200).json({ userCourseId });
 });
 

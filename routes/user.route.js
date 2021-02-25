@@ -104,40 +104,4 @@ router.put('/change-password', auth, validate(changePwSchema), async (req, res) 
   });
 });
 
-router.get('/students', authorization([types.ADMIN]), async (req, res) => {
-  const students = await userModel.adminFind({ role: 'user' });
-  if (students === null) {
-    return res.status(204).json({
-      message: 'Students empty.'
-    });
-  }
-  return res.status(200).json(students);
-});
-
-router.put('/students/:stdId', authorization([types.ADMIN]), validate(studentUpdateSchema), async (req, res) => {
-  const stdId = req.params.stdId;
-  await userModel.update({ id: stdId }, req.body);
-  return res.status(200).json({
-    message: 'Update successfully'
-  });
-});
-
-router.get('/teachers', authorization([types.ADMIN]), async (req, res) => {
-  const teachers = await userModel.adminFind({ role: 'teacher' });
-  if (teachers === null) {
-    return res.status(204).json({
-      message: 'Teachers empty.'
-    });
-  }
-  return res.status(200).json(teachers);
-})
-
-router.put('/teachers/:teacherId', authorization([types.ADMIN]), validate(teacherUpdateSchema), async (req, res) => {
-  const teacherId = req.params.teacherId;
-  await userModel.update({ id: teacherId }, req.body);
-  return res.status(200).json({
-    message: 'Update successfully'
-  });
-});
-
 module.exports = router;
