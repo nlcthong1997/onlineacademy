@@ -17,12 +17,14 @@ module.exports = {
     const count = await db('categories')
       .leftJoin('courses', 'courses.categories_id', 'categories.id')
       .where('categories.id', id)
+      .where('active', true)
       .whereIn('courses.status', status)
       .count('courses.id', { as: 'total' });
 
     const courses = await db('categories')
       .leftJoin('courses', 'courses.categories_id', 'categories.id')
       .where('categories.id', id)
+      .where('active', true)
       .whereIn('courses.status', status)
       .limit(limit)
       .offset(offset);
