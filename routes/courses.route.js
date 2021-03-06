@@ -206,7 +206,7 @@ router.post('/:courseId(\\d+)/buy', auth, async (req, res) => {
   await courseModel.update({ qty_student_registed: qtyRegistered + 1 }, courseId);
 
   const userCourseId = await userCourseModel.add(userCourse);
-  
+
   return res.status(200).json({ userCourseId });
 });
 
@@ -300,7 +300,7 @@ router.get('/:courseId(\\d+)/slides', auth, async (req, res) => {
 
   //isValid Registered Course
   let isValid = await userCourseModel.isValid({ users_id: userId, courses_id: courseId });
-  if (role === types.USER && isValid) {
+  if (role === types.USER && !isValid) {
     return res.status(400).json({
       message: 'You have not registered for this course.'
     });

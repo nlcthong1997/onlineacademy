@@ -26,8 +26,16 @@
     },
     "role": {
       "anyOf": [
-        { "enum": [ "admin", "user" ] }
+        {
+          "enum": [
+            "admin",
+            "user"
+          ]
+        }
       ],
+      "type": "string"
+    },
+    "phone": {
       "type": "string"
     }
   }
