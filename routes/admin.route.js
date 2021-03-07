@@ -11,6 +11,7 @@ const adminUpdateCourseSchema = require('../schemas/admin_course_u.json');
 const createTeacher = require('../schemas/create_teacher.json');
 const userModel = require('../models/user.model');
 const courseModel = require('../models/course.model');
+const categoryModel = require('../models/category.model');
 const types = require('../types/user_role');
 
 router.get('/students', async (req, res) => {
@@ -91,6 +92,16 @@ router.post('/teachers', validate(createTeacher), async (req, res) => {
   return res.status(201).json({
     message: 'Tạo tài khoản thành công'
   })
+});
+
+router.get('/categories', async (req, res) => {
+  const categories = await categoryModel.adminFindAll();
+  if (categories === null) {
+    return res.status(204).json({
+      message: 'Không có dữ liệu'
+    });
+  }
+  return res.status(201).json(categories)
 });
 
 module.exports = router;

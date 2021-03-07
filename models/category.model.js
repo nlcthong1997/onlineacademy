@@ -45,6 +45,19 @@ module.exports = {
 
   delete: async (condition) => {
     return db('categories').where(condition).del();
+  },
+
+  adminFindAll: async () => {
+    const cat = await db('categories')
+      .leftJoin('courses', 'courses.categories_id', 'categories.id')
+      .count('courses.categories_id', { as: 'qty_course' })
+      .select('categories.name')
+      .groupBy('courses.categories_id')
+
+    if (cat.length === 0) {
+      return null;
+    }
+    return cat;
   }
 
 }
