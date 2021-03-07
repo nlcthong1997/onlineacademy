@@ -23,6 +23,10 @@ router.get('/info', auth, async (req, res) => {
   if (user === null) {
     return res.status(400); //user not exist => client logout => return status error 400
   }
+  user.social_account = false
+  if (user.ggid !== '') {
+    user.social_account = true
+  }
   delete user.password;
   delete user.ggid;
   delete user.active;
