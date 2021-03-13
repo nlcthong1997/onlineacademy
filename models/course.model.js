@@ -194,5 +194,9 @@ module.exports = {
       return 0;
     }
     return res.qty_student_registed;
+  },
+
+  updateTeacher: (fullName, teacherId) => {
+    return db('courses').where('teacher_id', teacherId).update({ teacher: fullName });
   }
 }

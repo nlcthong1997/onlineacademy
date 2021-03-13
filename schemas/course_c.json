@@ -5,7 +5,6 @@
     "title",
     "name",
     "teacher",
-    "price",
     "img",
     "img_name",
     "img_large",
@@ -36,12 +35,6 @@
       "type": "integer"
     },
     "qty_student_registed": {
-      "type": "integer"
-    },
-    "price": {
-      "type": "integer"
-    },
-    "price_promo": {
       "type": "integer"
     },
     "img": {

@@ -51,7 +51,7 @@ module.exports = {
     const cat = await db('categories')
       .leftJoin('courses', 'courses.categories_id', 'categories.id')
       .count('courses.categories_id', { as: 'qty_course' })
-      .select('categories.name')
+      .select('categories.id', 'categories.name')
       .groupBy('courses.categories_id')
 
     if (cat.length === 0) {

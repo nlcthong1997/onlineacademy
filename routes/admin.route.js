@@ -9,6 +9,8 @@ const studentUpdateSchema = require('../schemas/student_u.json')
 const teacherUpdateSchema = require('../schemas/teacher_u.json')
 const adminUpdateCourseSchema = require('../schemas/admin_course_u.json');
 const createTeacher = require('../schemas/create_teacher.json');
+const createCategory = require('../schemas/category_c.json');
+const updateCategory = require('../schemas/category_u.json');
 const userModel = require('../models/user.model');
 const courseModel = require('../models/course.model');
 const categoryModel = require('../models/category.model');
@@ -101,7 +103,23 @@ router.get('/categories', async (req, res) => {
       message: 'Không có dữ liệu'
     });
   }
-  return res.status(201).json(categories)
+  return res.status(201).json(categories);
 });
+
+router.post('/categories', validate(createCategory), async (req, res) => {
+  const category = req.body
+  await categoryModel.add(category);
+  res.status(201).json({
+    message: 'Create category successfully.'
+  });
+})
+
+router.put('/categories/:catId', validate(updateCategory), async (req, res) => {
+  const id = req.params.catId;
+  await categoryModel.update(req.body, id);
+  res.status(201).json({
+    message: 'Update category successfully.'
+  });
+})
 
 module.exports = router;

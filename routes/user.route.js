@@ -14,6 +14,7 @@ const userInfoSchema = require('../schemas/user_info.json');
 const studentUpdateSchema = require('../schemas/student_u.json')
 const teacherUpdateSchema = require('../schemas/teacher_u.json')
 const userModel = require('../models/user.model');
+const courseModel = require('../models/course.model');
 const codeMailModel = require('../models/code_email.model');
 const mailer = require('../utils/mailer');
 
@@ -72,7 +73,7 @@ router.get('/active-account/:codeId(\\d+)/:userId(\\d+)/:code', async (req, res)
 
 //update ignore password
 router.put('/', auth, validate(userInfoSchema), async (req, res) => {
-  const { userId } = req.accessTokenPayload;
+  const { userId, role } = req.accessTokenPayload;
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({
       message: 'Missing data!'
@@ -80,6 +81,13 @@ router.put('/', auth, validate(userInfoSchema), async (req, res) => {
   }
 
   await userModel.update({ id: userId }, req.body);
+
+  let fullName = req.body.full_name;
+
+  if (role === types.TEACHER) {
+    await courseModel.updateTeacher(fullName, userId);
+  }
+
   return res.status(201).json({
     message: 'Update successfully.'
   });
