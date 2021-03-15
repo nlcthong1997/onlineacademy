@@ -73,16 +73,14 @@ module.exports = {
   },
 
   subscribedCourses: async (limit, dates, status = ['completed']) => {
-    const subscribed = await db('courses')
-      .count('courses.categories_id', { as: 'countRegistered' })
+    const subscribed = await db('users_courses')
       .select('categories.name', 'courses.*')
-      .leftJoin('users_courses', 'courses.id', 'users_courses.courses_id')
+      .leftJoin('courses', 'users_courses.courses_id', 'courses.id')
       .leftJoin('categories', 'courses.categories_id', 'categories.id')
       .whereBetween('users_courses.created_at', dates)
-      .whereIn('status', status)
-      .where('active', true)
-      .groupBy('courses.categories_id')
-      .orderBy('countRegistered', 'desc')
+      .whereIn('courses.status', status)
+      .where('courses.active', true)
+      .orderBy('courses.qty_student_registed', 'desc')
       .limit(limit);
 
     if (subscribed.length === 0) {
