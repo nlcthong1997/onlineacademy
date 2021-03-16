@@ -103,7 +103,7 @@ router.get('/categories', async (req, res) => {
       message: 'Không có dữ liệu'
     });
   }
-  return res.status(201).json(categories);
+  return res.status(200).json(categories);
 });
 
 router.post('/categories', validate(createCategory), async (req, res) => {
@@ -121,5 +121,29 @@ router.put('/categories/:catId', validate(updateCategory), async (req, res) => {
     message: 'Update category successfully.'
   });
 })
+
+router.get('/accounts', async (req, res) => {
+  const accounts = await userModel.adminFind({ role: types.TEACHER });
+  if (accounts === null) {
+    return res.status(204).json({
+      message: 'Empty account'
+    });
+  }
+  return res.status(200).json(accounts)
+});
+
+router.put('/teachers/:id/reset-password', async (req, res) => {
+  const hashPassword = bcrypt.hashSync(req.body.password, 10);
+  const isUpdate = await userModel.updatePassword(req.params.id, hashPassword);
+  if (isUpdate) {
+    res.status(201).json({
+      message: 'Update password successfully.'
+    });
+  } else {
+    res.status(400).json({
+      message: 'Update password failed.'
+    });
+  }
+});
 
 module.exports = router;
