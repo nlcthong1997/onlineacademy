@@ -74,7 +74,8 @@ module.exports = {
 
   subscribedCourses: async (limit, dates, status = ['completed']) => {
     const subscribed = await db('users_courses')
-      .select('categories.name', 'courses.*')
+      .distinct('courses.id')
+      .select('categories.name', 'courses.categories_id', 'courses.*')
       .leftJoin('courses', 'users_courses.courses_id', 'courses.id')
       .leftJoin('categories', 'courses.categories_id', 'categories.id')
       .whereBetween('users_courses.created_at', dates)
