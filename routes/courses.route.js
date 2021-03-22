@@ -234,7 +234,7 @@ router.post('/', authorization([types.TEACHER]), validate(createCourseSchema), a
   let { userId } = req.accessTokenPayload;
   course.teacher_id = userId;
   course.search_name = cv.removeVietnameseTones(course.name);
-  course.active = false;
+  course.active = true;
   course.status = 'completed';
   let courseId = await courseModel.add(course);
   return res.status(201).json({ id: courseId });
